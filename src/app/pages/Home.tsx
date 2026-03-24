@@ -39,11 +39,11 @@ export function Home() {
               and municipal levels.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link to="/spendings" className={cn(navButtonPrimary, "gap-2")}>
+              <Link to="/spendings?level=federal" className={cn(navButtonPrimary, "gap-2")}>
                 Explore Federal Budget
                 <ArrowRight className="w-4 h-4 shrink-0" aria-hidden />
               </Link>
-              <Link to="/provincial" className={navButtonOnDarkOutline}>
+              <Link to="/spendings?level=province" className={navButtonOnDarkOutline}>
                 View Provincial Budgets
               </Link>
             </div>

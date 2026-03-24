@@ -1,5 +1,6 @@
 import { Filter } from "lucide-react";
 import * as React from "react";
+import { useSearchParams } from "react-router";
 import { FederalBudgetDashboard } from "../components/FederalBudgetDashboard";
 import { MunicipalBudgetDashboard } from "../components/MunicipalBudgetDashboard";
 import { ProvincialBudgetDashboard } from "../components/ProvincialBudgetDashboard";
@@ -66,6 +67,7 @@ const PROVINCE_OPTIONS = [
 const ALL_MUNICIPALS = "All Municipalities";
 
 export default function Spendings() {
+  const [searchParams] = useSearchParams();
   const [level, setLevel] = React.useState<(typeof LEVEL_OPTIONS)[number]>("Federal");
   const [year, setYear] = React.useState<string>("2025");
   const [sector, setSector] = React.useState<string>(FEDERAL_CATEGORY_NAMES[0] ?? "Elderly Benefits");
@@ -77,6 +79,21 @@ export default function Spendings() {
   const [municipalRows, setMunicipalRows] = React.useState<MunicipalBudgetRow[] | null>(null);
   const [municipalLoading, setMunicipalLoading] = React.useState(false);
   const [municipalSelection, setMunicipalSelection] = React.useState<string>(ALL_MUNICIPALS);
+
+  React.useEffect(() => {
+    const raw = searchParams.get("level")?.toLowerCase();
+    if (raw === "province" || raw === "provincial") {
+      setLevel("Province");
+      return;
+    }
+    if (raw === "municipal" || raw === "municipality") {
+      setLevel("Municipal");
+      return;
+    }
+    if (raw === "federal") {
+      setLevel("Federal");
+    }
+  }, [searchParams]);
 
   React.useEffect(() => {
     if (level !== "Municipal") return;
