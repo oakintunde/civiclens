@@ -1,0 +1,80 @@
+[
+  {
+    "city": "Toronto",
+    "province": "ON",
+    "total": 16300000000,
+    "perCapita": 5541,
+    "topCategories": [
+      { "name": "Transportation", "amount": 4900000000, "percentage": 30.0 },
+      { "name": "Emergency Services", "amount": 2600000000, "percentage": 16.0 },
+      { "name": "Parks & Recreation", "amount": 1300000000, "percentage": 8.0 },
+      { "name": "Water & Waste", "amount": 2100000000, "percentage": 13.0 },
+      { "name": "Other", "amount": 5400000000, "percentage": 33.0 }
+    ]
+  },
+  {
+    "city": "Montreal",
+    "province": "QC",
+    "total": 6800000000,
+    "perCapita": 3773,
+    "topCategories": [
+      { "name": "Transportation", "amount": 2000000000, "percentage": 29.0 },
+      { "name": "Emergency Services", "amount": 1100000000, "percentage": 16.0 },
+      { "name": "Parks & Recreation", "amount": 550000000, "percentage": 8.0 },
+      { "name": "Water & Waste", "amount": 820000000, "percentage": 12.0 },
+      { "name": "Other", "amount": 2330000000, "percentage": 35.0 }
+    ]
+  },
+  {
+    "city": "Vancouver",
+    "province": "BC",
+    "total": 1900000000,
+    "perCapita": 2885,
+    "topCategories": [
+      { "name": "Transportation", "amount": 570000000, "percentage": 30.0 },
+      { "name": "Emergency Services", "amount": 290000000, "percentage": 15.0 },
+      { "name": "Parks & Recreation", "amount": 190000000, "percentage": 10.0 },
+      { "name": "Water & Waste", "amount": 230000000, "percentage": 12.0 },
+      { "name": "Other", "amount": 620000000, "percentage": 33.0 }
+    ]
+  },
+  {
+    "city": "Calgary",
+    "province": "AB",
+    "total": 4700000000,
+    "perCapita": 3358,
+    "topCategories": [
+      { "name": "Transportation", "amount": 1400000000, "percentage": 30.0 },
+      { "name": "Emergency Services", "amount": 710000000, "percentage": 15.0 },
+      { "name": "Parks & Recreation", "amount": 380000000, "percentage": 8.0 },
+      { "name": "Water & Waste", "amount": 610000000, "percentage": 13.0 },
+      { "name": "Other", "amount": 1600000000, "percentage": 34.0 }
+    ]
+  },
+  {
+    "city": "Ottawa",
+    "province": "ON",
+    "total": 4200000000,
+    "perCapita": 4042,
+    "topCategories": [
+      { "name": "Transportation", "amount": 1300000000, "percentage": 31.0 },
+      { "name": "Emergency Services", "amount": 630000000, "percentage": 15.0 },
+      { "name": "Parks & Recreation", "amount": 340000000, "percentage": 8.0 },
+      { "name": "Water & Waste", "amount": 550000000, "percentage": 13.0 },
+      { "name": "Other", "amount": 1380000000, "percentage": 33.0 }
+    ]
+  },
+  {
+    "city": "Edmonton",
+    "province": "AB",
+    "total": 3900000000,
+    "perCapita": 3823,
+    "topCategories": [
+      { "name": "Transportation", "amount": 1200000000, "percentage": 31.0 },
+      { "name": "Emergency Services", "amount": 590000000, "percentage": 15.0 },
+      { "name": "Parks & Recreation", "amount": 310000000, "percentage": 8.0 },
+      { "name": "Water & Waste", "amount": 470000000, "percentage": 12.0 },
+      { "name": "Other", "amount": 1330000000, "percentage": 34.0 }
+    ]
+  }
+]
