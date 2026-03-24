@@ -1,3 +1,53 @@
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+
+const SHARE_LINKS = [
+  { name: "Facebook", href: "https://www.facebook.com/sharer/sharer.php?u=https://civiclens.ca", Icon: Facebook },
+  { name: "Instagram", href: "https://www.instagram.com/", Icon: Instagram },
+  { name: "X", href: "https://x.com/intent/tweet?url=https://civiclens.ca&text=Explore%20CivicLens%20Infographics", Icon: Twitter },
+  { name: "LinkedIn", href: "https://www.linkedin.com/sharing/share-offsite/?url=https://civiclens.ca", Icon: Linkedin },
+];
+
 export default function Infographics() {
-  return <div className="page-content">Infographics interactive content placeholder</div>
+  return (
+    <div style={{ fontFamily: "Poppins, sans-serif" }}>
+      <section
+        style={{
+          background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="max-w-3xl">
+              <h1
+                className="text-4xl md:text-5xl font-bold text-white mb-3"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                Infographics
+              </h1>
+              <p className="text-base md:text-lg text-white/90">
+                We transform complex budget data into clear visual stories that make public spending easier to
+                understand, share, and act on.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 md:gap-3">
+              {SHARE_LINKS.map(({ name, href, Icon }) => (
+                <a
+                  key={name}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Share on ${name}`}
+                  title={`Share on ${name}`}
+                  className="inline-flex items-center justify-center w-11 h-11 rounded-lg border-2 border-white/80 text-white hover:bg-[#f48945] hover:border-[#f48945] transition-colors"
+                >
+                  <Icon className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
