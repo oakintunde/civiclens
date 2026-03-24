@@ -116,7 +116,7 @@ export function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Federal Budget Card */}
           <Link
-            to="/federal"
+            to="/spendings?level=federal"
             className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-8 border-2 border-gray-100"
             style={{
               borderColor: "#e5e7eb",
@@ -168,7 +168,7 @@ export function Home() {
 
           {/* Provincial Budgets Card */}
           <Link
-            to="/provincial"
+            to="/spendings?level=province"
             className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-8 border-2 border-gray-100"
             style={{ borderColor: "#e5e7eb" }}
             onMouseEnter={(e) => {
@@ -208,7 +208,7 @@ export function Home() {
 
           {/* Municipal Budgets Card */}
           <Link
-            to="/municipal"
+            to="/spendings?level=municipal"
             className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-8 border-2 border-gray-100"
             style={{ borderColor: "#e5e7eb" }}
             onMouseEnter={(e) => {
