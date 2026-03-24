@@ -1,6 +1,6 @@
 import { Heart } from "lucide-react";
 import { Link } from "react-router";
-import { navButtonPrimary } from "../lib/navButtonStyles";
+import { navButtonOnDarkOutline } from "../lib/navButtonStyles";
 
 export function Footer() {
   return (
@@ -20,7 +20,7 @@ export function Footer() {
                 <p className="text-white/80 text-sm mb-4">
                   Support good work by donating to our mission to improve quality of work we deliver.
                 </p>
-                <button type="button" className={navButtonPrimary}>
+                <button type="button" className={navButtonOnDarkOutline}>
                   Donate Now
                 </button>
               </div>
