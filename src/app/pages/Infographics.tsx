@@ -25,7 +25,7 @@ export default function Infographics() {
                 Infographics
               </h1>
               <p className="text-base md:text-lg text-white/90">
-                We pioneered the art of using data and design to simplify the budget
+                We turn complex public finance data into clear, visual stories that make budgets easier to understand.
               </p>
             </div>
 
