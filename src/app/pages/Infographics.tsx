@@ -1,5 +1,6 @@
 import { Facebook, Linkedin, Mail, Twitter } from "lucide-react";
 import * as React from "react";
+import { BUDGET_LEVEL_OPTIONS, type BudgetLevel, getBudgetApiBase, toBudgetLevelParam } from "../lib/budgetApi";
 
 const SHARE_LINKS = [
   { name: "Email", href: "mailto:?subject=CivicLens Infographics&body=https://civiclens.ca/infographics", Icon: Mail },
@@ -8,30 +9,8 @@ const SHARE_LINKS = [
   { name: "LinkedIn", href: "https://www.linkedin.com/sharing/share-offsite/?url=https://civiclens.ca", Icon: Linkedin },
 ];
 
-const LEVEL_OPTIONS = ["Federal", "Province", "Municipal"] as const;
-
-function getApiBase(): string {
-  const explicit = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");
-  if (explicit) return explicit;
-  const newsUrl = import.meta.env.VITE_NEWS_API_URL as string | undefined;
-  if (newsUrl) {
-    try {
-      return new URL(newsUrl).origin;
-    } catch {
-      /* ignore */
-    }
-  }
-  return "http://localhost:3001";
-}
-
-function levelQueryParam(level: (typeof LEVEL_OPTIONS)[number]): "federal" | "province" | "municipal" {
-  if (level === "Federal") return "federal";
-  if (level === "Province") return "province";
-  return "municipal";
-}
-
 export default function Infographics() {
-  const [level, setLevel] = React.useState<(typeof LEVEL_OPTIONS)[number]>("Federal");
+  const [level, setLevel] = React.useState<BudgetLevel>("Federal");
   const [year, setYear] = React.useState<string>("2025");
   const [category, setCategory] = React.useState<string>("");
   const [yearOptions, setYearOptions] = React.useState<string[]>(["2025"]);
@@ -41,8 +20,8 @@ export default function Infographics() {
 
   React.useEffect(() => {
     let cancelled = false;
-    const base = getApiBase();
-    const param = levelQueryParam(level);
+    const base = getBudgetApiBase();
+    const param = toBudgetLevelParam(level);
     setYearsLoading(true);
     setCategoriesLoading(true);
 
@@ -156,10 +135,10 @@ export default function Infographics() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Government Level</label>
               <select
                 value={level}
-                onChange={(e) => setLevel(e.target.value as (typeof LEVEL_OPTIONS)[number])}
+                onChange={(e) => setLevel(e.target.value as BudgetLevel)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
               >
-                {LEVEL_OPTIONS.map((item) => (
+                {BUDGET_LEVEL_OPTIONS.map((item) => (
                   <option key={item} value={item}>
                     {item}
                   </option>

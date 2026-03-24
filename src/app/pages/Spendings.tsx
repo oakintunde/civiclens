@@ -15,37 +15,16 @@ import {
   PROVINCIAL_CATEGORY_NAMES,
   PROVINCIAL_DATA_YEARS,
 } from "../data/budgetData";
+import { BUDGET_LEVEL_OPTIONS, type BudgetLevel, getBudgetApiBase, toBudgetLevelParam } from "../lib/budgetApi";
 import { navButtonBase } from "../lib/navButtonStyles";
 
-const LEVEL_OPTIONS = ["Federal", "Province", "Municipal"] as const;
-
-function getApiBase(): string {
-  const explicit = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");
-  if (explicit) return explicit;
-  const newsUrl = import.meta.env.VITE_NEWS_API_URL as string | undefined;
-  if (newsUrl) {
-    try {
-      return new URL(newsUrl).origin;
-    } catch {
-      /* ignore */
-    }
-  }
-  return "http://localhost:3001";
-}
-
-function levelQueryParam(level: (typeof LEVEL_OPTIONS)[number]): "federal" | "province" | "municipal" {
-  if (level === "Federal") return "federal";
-  if (level === "Province") return "province";
-  return "municipal";
-}
-
-function fallbackCategoriesForLevel(level: (typeof LEVEL_OPTIONS)[number]): string[] {
+function fallbackCategoriesForLevel(level: BudgetLevel): string[] {
   if (level === "Federal") return [...FEDERAL_CATEGORY_NAMES];
   if (level === "Province") return [...PROVINCIAL_CATEGORY_NAMES];
   return [...MUNICIPAL_CATEGORY_NAMES];
 }
 
-function fallbackYearsForLevel(level: (typeof LEVEL_OPTIONS)[number]): string[] {
+function fallbackYearsForLevel(level: BudgetLevel): string[] {
   if (level === "Federal") return [...FEDERAL_DATA_YEARS].reverse().map(String);
   if (level === "Province") return [...PROVINCIAL_DATA_YEARS].reverse().map(String);
   return [...MUNICIPAL_DATA_YEARS].reverse().map(String);
@@ -68,7 +47,7 @@ const ALL_MUNICIPALS = "All Municipalities";
 
 export default function Spendings() {
   const [searchParams] = useSearchParams();
-  const [level, setLevel] = React.useState<(typeof LEVEL_OPTIONS)[number]>("Federal");
+  const [level, setLevel] = React.useState<BudgetLevel>("Federal");
   const [year, setYear] = React.useState<string>("2025");
   const [sector, setSector] = React.useState<string>(FEDERAL_CATEGORY_NAMES[0] ?? "Elderly Benefits");
   const [province, setProvince] = React.useState<(typeof PROVINCE_OPTIONS)[number]>("All Provinces");
@@ -100,7 +79,7 @@ export default function Spendings() {
     let cancelled = false;
     const y = parseInt(year, 10) || 2025;
     setMunicipalLoading(true);
-    fetch(`${getApiBase()}/api/municipal-budgets?year=${y}`)
+    fetch(`${getBudgetApiBase()}/api/municipal-budgets?year=${y}`)
       .then((res) => {
         if (!res.ok) throw new Error("municipal budgets fetch failed");
         return res.json() as Promise<{ cities?: unknown }>;
@@ -128,8 +107,8 @@ export default function Spendings() {
     setCategories(fallbackCategoriesForLevel(level));
     setYearOptions(fallbackYearsForLevel(level));
     let cancelled = false;
-    const param = levelQueryParam(level);
-    const base = getApiBase();
+    const param = toBudgetLevelParam(level);
+    const base = getBudgetApiBase();
     setCategoriesLoading(true);
     setYearsLoading(true);
 
@@ -241,10 +220,10 @@ export default function Spendings() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Government Level</label>
               <select
                 value={level}
-                onChange={(e) => setLevel(e.target.value as (typeof LEVEL_OPTIONS)[number])}
+                onChange={(e) => setLevel(e.target.value as BudgetLevel)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
               >
-                {LEVEL_OPTIONS.map((item) => (
+                {BUDGET_LEVEL_OPTIONS.map((item) => (
                   <option key={item} value={item}>
                     {item}
                   </option>
