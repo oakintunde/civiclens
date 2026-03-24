@@ -1,6 +1,13 @@
 import { Facebook, Linkedin, Mail, Twitter } from "lucide-react";
 import * as React from "react";
 import { BUDGET_LEVEL_OPTIONS, type BudgetLevel, getBudgetApiBase, toBudgetLevelParam } from "../lib/budgetApi";
+import { cn } from "../components/ui/utils";
+import {
+  getFederalBudgetForYear,
+  getMunicipalBudgetsForYear,
+  provincialBudgets2025,
+} from "../data/budgetData";
+import { navButtonBase } from "../lib/navButtonStyles";
 
 const SHARE_LINKS = [
   { name: "Email", href: "mailto:?subject=CivicLens Infographics&body=https://civiclens.ca/infographics", Icon: Mail },
@@ -8,6 +15,108 @@ const SHARE_LINKS = [
   { name: "X", href: "https://x.com/intent/tweet?url=https://civiclens.ca/infographics&text=Infographics", Icon: Twitter },
   { name: "LinkedIn", href: "https://www.linkedin.com/sharing/share-offsite/?url=https://civiclens.ca", Icon: Linkedin },
 ];
+
+type InfographicItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  dateLabel: string;
+  amount: number;
+  imageSrc: string;
+};
+
+function formatAmountShort(amount: number): string {
+  if (amount >= 1e9) return `$${(amount / 1e9).toFixed(2)}B`;
+  if (amount >= 1e6) return `$${(amount / 1e6).toFixed(0)}M`;
+  return `$${Math.round(amount).toLocaleString("en-CA")}`;
+}
+
+function pickAccent(level: BudgetLevel): string {
+  if (level === "Federal") return "#0B2545";
+  if (level === "Province") return "#318cca";
+  return "#f48945";
+}
+
+function makeInfographicImage(title: string, subtitle: string, amount: number, accent: string): string {
+  const safeTitle = title.replace(/&/g, "&amp;").slice(0, 42);
+  const safeSubtitle = subtitle.replace(/&/g, "&amp;").slice(0, 32);
+  const amountLabel = formatAmountShort(amount);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='640' height='420' viewBox='0 0 640 420'>
+<defs>
+<linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+<stop offset='0%' stop-color='#0B2545'/>
+<stop offset='100%' stop-color='#193865'/>
+</linearGradient>
+</defs>
+<rect width='640' height='420' fill='url(#bg)'/>
+<rect x='24' y='24' width='592' height='58' rx='10' fill='rgba(255,255,255,0.08)'/>
+<text x='40' y='61' fill='white' font-size='22' font-family='Arial, sans-serif' font-weight='700'>${safeTitle}</text>
+<text x='40' y='113' fill='#d6e4ef' font-size='16' font-family='Arial, sans-serif'>${safeSubtitle}</text>
+<text x='40' y='164' fill='white' font-size='54' font-family='Arial, sans-serif' font-weight='700'>${amountLabel}</text>
+<rect x='40' y='220' width='330' height='18' rx='9' fill='rgba(255,255,255,0.2)'/>
+<rect x='40' y='220' width='220' height='18' rx='9' fill='${accent}'/>
+<rect x='40' y='258' width='260' height='16' rx='8' fill='rgba(255,255,255,0.2)'/>
+<rect x='40' y='258' width='160' height='16' rx='8' fill='#8ab6d6'/>
+<rect x='40' y='294' width='300' height='16' rx='8' fill='rgba(255,255,255,0.2)'/>
+<rect x='40' y='294' width='250' height='16' rx='8' fill='#6aa0c8'/>
+<circle cx='540' cy='276' r='64' fill='rgba(255,255,255,0.1)'/>
+<circle cx='540' cy='276' r='48' fill='${accent}'/>
+<text x='514' y='282' fill='white' font-size='18' font-family='Arial, sans-serif' font-weight='700'>DATA</text>
+</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function buildInfographicItems(level: BudgetLevel, year: string, category: string): InfographicItem[] {
+  const y = parseInt(year, 10) || 2025;
+  const accent = pickAccent(level);
+
+  if (level === "Federal") {
+    const snap = getFederalBudgetForYear(y);
+    return snap.categories
+      .filter((c) => !category || c.name === category)
+      .sort((a, b) => b.amount - a.amount)
+      .map((c, idx) => ({
+        id: `f-${c.name}-${idx}`,
+        title: c.name,
+        subtitle: "Federal spending brief",
+        dateLabel: `${y} Federal Budget`,
+        amount: c.amount,
+        imageSrc: makeInfographicImage(c.name, "Federal spending brief", c.amount, accent),
+      }));
+  }
+
+  if (level === "Province") {
+    return provincialBudgets2025
+      .flatMap((p) =>
+        p.topCategories
+          .filter((c) => !category || c.name === category)
+          .map((c, idx) => ({
+            id: `p-${p.province}-${c.name}-${idx}`,
+            title: `${p.province} - ${c.name}`,
+            subtitle: "Provincial spending brief",
+            dateLabel: `${y} Provincial Budget`,
+            amount: c.amount,
+            imageSrc: makeInfographicImage(`${p.province} - ${c.name}`, "Provincial spending brief", c.amount, accent),
+          })),
+      )
+      .sort((a, b) => b.amount - a.amount);
+  }
+
+  return getMunicipalBudgetsForYear(y)
+    .flatMap((m) =>
+      m.topCategories
+        .filter((c) => !category || c.name === category)
+        .map((c, idx) => ({
+          id: `m-${m.city}-${c.name}-${idx}`,
+          title: `${m.city} - ${c.name}`,
+          subtitle: "Municipal spending brief",
+          dateLabel: `${y} Municipal Budget`,
+          amount: c.amount,
+          imageSrc: makeInfographicImage(`${m.city} - ${c.name}`, "Municipal spending brief", c.amount, accent),
+        })),
+    )
+    .sort((a, b) => b.amount - a.amount);
+}
 
 export default function Infographics() {
   const [level, setLevel] = React.useState<BudgetLevel>("Federal");
@@ -83,6 +192,11 @@ export default function Infographics() {
     setCategory((prev) => (categoryOptions.includes(prev) ? prev : categoryOptions[0]!));
   }, [categoryOptions]);
 
+  const infographicItems = React.useMemo(
+    () => buildInfographicItems(level, year, category).slice(0, 9),
+    [level, year, category],
+  );
+
   return (
     <div style={{ fontFamily: "Poppins, sans-serif" }}>
       <section
@@ -130,8 +244,8 @@ export default function Infographics() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-xl border-2 p-5 md:p-6" style={{ borderColor: "#e8eef5" }}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Government Level</label>
               <select
                 value={level}
@@ -146,7 +260,7 @@ export default function Infographics() {
               </select>
             </div>
 
-            <div>
+            <div className="lg:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
               <select
                 value={year}
@@ -163,7 +277,7 @@ export default function Infographics() {
               </select>
             </div>
 
-            <div>
+            <div className="lg:col-span-5">
               <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
                 value={category}
@@ -180,6 +294,47 @@ export default function Infographics() {
               </select>
             </div>
           </div>
+
+          <div className="mt-4 flex flex-wrap justify-start gap-3">
+            <button
+              type="button"
+              className={cn(
+                navButtonBase,
+                "min-w-[140px] border-2 border-[#318cca] bg-[#318cca] text-white hover:bg-[#f48945] hover:border-[#f48945]",
+              )}
+            >
+              Filter
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {infographicItems.map((item) => (
+            <article
+              key={item.id}
+              className="bg-white rounded-xl border-2 overflow-hidden"
+              style={{ borderColor: "#e8eef5" }}
+            >
+              <div className="relative">
+                <img src={item.imageSrc} alt={item.title} className="w-full h-[280px] object-cover" />
+                <button
+                  type="button"
+                  className="absolute left-3 bottom-3 px-4 py-2 rounded-md bg-[#0B2545] text-white text-sm font-medium"
+                >
+                  PREVIEW
+                </button>
+              </div>
+              <div className="p-4">
+                <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">{item.dateLabel}</p>
+                <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">{item.subtitle}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
     </div>
