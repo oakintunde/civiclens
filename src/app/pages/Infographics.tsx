@@ -1,7 +1,11 @@
 import * as React from "react";
+import { BudgetFiltersCard } from "../components/BudgetFiltersCard";
 import { SharePageSocialRow } from "../components/SharePageSocialRow";
+import { useBudgetFiltersState } from "../hooks/useBudgetFiltersState";
 
 export default function Infographics() {
+  const filters = useBudgetFiltersState({ syncUrlLevel: false });
+
   const pageUrl = React.useMemo(() => {
     if (typeof window !== "undefined") return `${window.location.origin}/infographics`;
     return "https://civiclens.ca/infographics";
@@ -32,6 +36,8 @@ export default function Infographics() {
           </div>
         </div>
       </section>
+
+      <BudgetFiltersCard {...filters} />
     </div>
   );
 }
