@@ -69,6 +69,8 @@ type GlamaServerResponse = {
   attributes?: string[];
 };
 
+const ALL_CATEGORIES_OPTION = "All";
+
 function buildInfographicItems(
   glama: GlamaServerResponse,
   level: BudgetLevel,
@@ -76,7 +78,8 @@ function buildInfographicItems(
   category: string,
 ): InfographicItem[] {
   const accent = pickAccent(level);
-  const subtitle = category ? `${level} • ${category}` : `${level} • All categories`;
+  const isAll = !category || category === ALL_CATEGORIES_OPTION;
+  const subtitle = isAll ? `${level} • All categories` : `${level} • ${category}`;
   const dateLabel = `${year} • Infographics`;
   const baseName = glama.name ?? "Government of Canada Open Data MCP Servers";
   const body = glama.description ?? "No description provided by the Glama MCP server listing.";
@@ -106,7 +109,7 @@ function buildInfographicItems(
 export default function Infographics() {
   const [level, setLevel] = React.useState<BudgetLevel>("Federal");
   const [year, setYear] = React.useState<string>("2025");
-  const [category, setCategory] = React.useState<string>("");
+  const [category, setCategory] = React.useState<string>(ALL_CATEGORIES_OPTION);
   const [yearOptions, setYearOptions] = React.useState<string[]>(["2025"]);
   const [categoryOptions, setCategoryOptions] = React.useState<string[]>([]);
   const [yearsLoading, setYearsLoading] = React.useState(false);
@@ -178,10 +181,10 @@ export default function Infographics() {
         const list = Array.isArray(data.categories)
           ? data.categories.filter((x): x is string => typeof x === "string" && x.length > 0)
           : [];
-        if (!cancelled) setCategoryOptions(list);
+        if (!cancelled) setCategoryOptions([ALL_CATEGORIES_OPTION, ...list]);
       })
       .catch(() => {
-        if (!cancelled) setCategoryOptions([]);
+        if (!cancelled) setCategoryOptions([ALL_CATEGORIES_OPTION]);
       })
       .finally(() => {
         if (!cancelled) setCategoriesLoading(false);
@@ -201,7 +204,7 @@ export default function Infographics() {
 
   React.useEffect(() => {
     if (categoryOptions.length === 0) {
-      setCategory("");
+      setCategory(ALL_CATEGORIES_OPTION);
       return;
     }
     setCategory((prev) => (categoryOptions.includes(prev) ? prev : categoryOptions[0]!));
