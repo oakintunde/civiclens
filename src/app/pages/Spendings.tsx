@@ -46,6 +46,9 @@ const PROVINCE_OPTIONS = [
 ] as const;
 const ALL_MUNICIPALS = "All Municipalities";
 
+const FEDERAL_YEAR_PLACEHOLDER_LABEL = "Select Year e.g. 2025";
+const FEDERAL_SECTOR_PLACEHOLDER_LABEL = "Select Sector e.g. Health Transfers";
+
 function spendingsLevelQuery(level: BudgetLevel): "federal" | "province" | "municipal" {
   if (level === "Federal") return "federal";
   if (level === "Province") return "province";
@@ -55,8 +58,8 @@ function spendingsLevelQuery(level: BudgetLevel): "federal" | "province" | "muni
 export default function Spendings() {
   const [searchParams] = useSearchParams();
   const [level, setLevel] = React.useState<BudgetLevel>("Federal");
-  const [year, setYear] = React.useState<string>("2025");
-  const [sector, setSector] = React.useState<string>(FEDERAL_CATEGORY_NAMES[0] ?? "Elderly Benefits");
+  const [year, setYear] = React.useState<string>("");
+  const [sector, setSector] = React.useState<string>("");
   const [province, setProvince] = React.useState<(typeof PROVINCE_OPTIONS)[number]>("All Provinces");
   const [categories, setCategories] = React.useState<string[]>(() => fallbackCategoriesForLevel("Federal"));
   const [categoriesLoading, setCategoriesLoading] = React.useState(false);
@@ -70,14 +73,20 @@ export default function Spendings() {
     const raw = searchParams.get("level")?.toLowerCase();
     if (raw === "province" || raw === "provincial") {
       setLevel("Province");
+      setYear(fallbackYearsForLevel("Province")[0] ?? "2025");
+      setSector(fallbackCategoriesForLevel("Province")[0] ?? "");
       return;
     }
     if (raw === "municipal" || raw === "municipality") {
       setLevel("Municipal");
+      setYear(fallbackYearsForLevel("Municipal")[0] ?? "2025");
+      setSector(fallbackCategoriesForLevel("Municipal")[0] ?? "");
       return;
     }
     if (raw === "federal") {
       setLevel("Federal");
+      setYear("");
+      setSector("");
     }
   }, [searchParams]);
 
@@ -165,13 +174,33 @@ export default function Spendings() {
 
   React.useEffect(() => {
     if (categories.length === 0) return;
-    setSector((prev) => (categories.includes(prev) ? prev : categories[0]!));
-  }, [categories]);
+    if (level === "Federal") {
+      setSector((prev) => {
+        if (prev === "") return "";
+        return categories.includes(prev) ? prev : "";
+      });
+      return;
+    }
+    setSector((prev) => {
+      if (prev === "" || !categories.includes(prev)) return categories[0]!;
+      return prev;
+    });
+  }, [categories, level]);
 
   React.useEffect(() => {
     if (yearOptions.length === 0) return;
-    setYear((prev) => (yearOptions.includes(prev) ? prev : yearOptions[0]!));
-  }, [yearOptions]);
+    if (level === "Federal") {
+      setYear((prev) => {
+        if (prev === "") return "";
+        return yearOptions.includes(prev) ? prev : "";
+      });
+      return;
+    }
+    setYear((prev) => {
+      if (prev === "" || !yearOptions.includes(prev)) return yearOptions[0]!;
+      return prev;
+    });
+  }, [yearOptions, level]);
 
   const municipalOptions = React.useMemo(() => {
     const rows = municipalRows ?? getMunicipalBudgetsForYear(parseInt(year, 10) || 2025);
@@ -189,7 +218,9 @@ export default function Spendings() {
   const sectorOptions = categories;
   const title =
     level === "Federal"
-      ? `Federal Budget ${year}`
+      ? year
+        ? `Federal Budget ${year}`
+        : "Federal Budget"
       : level === "Province"
         ? `Provincial Budgets ${year}`
         : `Municipal Budgets ${year}`;
@@ -239,7 +270,19 @@ export default function Spendings() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Government Level</label>
               <select
                 value={level}
-                onChange={(e) => setLevel(e.target.value as BudgetLevel)}
+                onChange={(e) => {
+                  const next = e.target.value as BudgetLevel;
+                  setLevel(next);
+                  if (next === "Federal") {
+                    setYear("");
+                    setSector("");
+                  } else {
+                    const yrs = fallbackYearsForLevel(next);
+                    setYear(yrs[0] ?? "2025");
+                    const cats = fallbackCategoriesForLevel(next);
+                    setSector(cats[0] ?? "");
+                  }
+                }}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
               >
                 {BUDGET_LEVEL_OPTIONS.map((item) => (
@@ -259,6 +302,9 @@ export default function Spendings() {
                 aria-busy={yearsLoading}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca] disabled:opacity-60"
               >
+                {level === "Federal" ? (
+                  <option value="">{FEDERAL_YEAR_PLACEHOLDER_LABEL}</option>
+                ) : null}
                 {yearOptions.map((item) => (
                   <option key={item} value={item}>
                     {item}
@@ -278,6 +324,9 @@ export default function Spendings() {
                 aria-busy={categoriesLoading}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca] disabled:opacity-60"
               >
+                {level === "Federal" ? (
+                  <option value="">{FEDERAL_SECTOR_PLACEHOLDER_LABEL}</option>
+                ) : null}
                 {sectorOptions.map((item) => (
                   <option key={item} value={item}>
                     {item}

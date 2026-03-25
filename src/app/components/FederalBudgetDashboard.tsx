@@ -12,7 +12,11 @@ import {
   YAxis,
 } from "recharts";
 import { cn } from "../components/ui/utils";
-import { formatBillions, getFederalBudgetForYear } from "../data/budgetData";
+import {
+  formatBillions,
+  getFederalBudgetAllYearsSummary,
+  getFederalBudgetForYear,
+} from "../data/budgetData";
 
 type Props = {
   year: string;
@@ -21,8 +25,18 @@ type Props = {
 };
 
 export function FederalBudgetDashboard({ year, selectedSector }: Props) {
-  const y = Number.parseInt(year, 10) || 2025;
-  const snap = getFederalBudgetForYear(y);
+  const yearUnset = year === "";
+  const y = yearUnset ? 2025 : Number.parseInt(year, 10) || 2025;
+  const allYears = yearUnset ? getFederalBudgetAllYearsSummary() : null;
+  const snapBase = getFederalBudgetForYear(y);
+  const snap = yearUnset && allYears
+    ? {
+        ...snapBase,
+        total: allYears.averageTotal,
+        perCapita: allYears.averagePerCapita,
+        yoyPercent: allYears.periodGrowthPercent,
+      }
+    : snapBase;
 
   const pieData = snap.categories.map((c) => ({
     name: c.name,
@@ -114,7 +128,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
           <div>
             <p className="text-sm text-gray-600 mb-1">Fiscal Year</p>
             <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
-              {snap.year}
+              {yearUnset ? "All Year" : snap.year}
             </p>
           </div>
         </div>
@@ -149,12 +163,14 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                   }
                 >
                   {pieData.map((entry) => {
-                    const selected = entry.name === selectedSector;
+                    const selected =
+                      selectedSector !== "" && entry.name === selectedSector;
+                    const dim = selectedSector !== "" && !selected;
                     return (
                       <Cell
                         key={entry.name}
                         fill={entry.color}
-                        fillOpacity={selected ? 1 : 0.35}
+                        fillOpacity={dim ? 0.35 : 1}
                         stroke={selected ? "#f48945" : "#fff"}
                         strokeWidth={selected ? 4 : 1}
                       />
@@ -177,7 +193,9 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                 key={c.name}
                 className={cn(
                   "flex items-center gap-2 text-xs",
-                  c.name === selectedSector ? "text-gray-900 font-semibold" : "text-gray-500",
+                  selectedSector === "" || c.name === selectedSector
+                    ? "text-gray-900 font-semibold"
+                    : "text-gray-500",
                 )}
               >
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
@@ -223,12 +241,14 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                 />
                 <Bar dataKey="billions" radius={[0, 4, 4, 0]}>
                   {barData.map((entry) => {
-                    const selected = entry.name === selectedSector;
+                    const selected =
+                      selectedSector !== "" && entry.name === selectedSector;
+                    const dim = selectedSector !== "" && !selected;
                     return (
                       <Cell
                         key={entry.name}
                         fill={selected ? "#f48945" : "#0B2545"}
-                        fillOpacity={selected ? 1 : 0.35}
+                        fillOpacity={dim ? 0.35 : 1}
                       />
                     );
                   })}
@@ -276,7 +296,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                   key={row.name}
                   className={cn(
                     "border-b border-gray-100",
-                    row.name === selectedSector && "bg-[#fff7f0]",
+                    selectedSector !== "" && row.name === selectedSector && "bg-[#fff7f0]",
                   )}
                 >
                   <td className="px-5 py-4">
@@ -297,7 +317,9 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                       <div
                         className={cn(
                           "h-full rounded-full transition-all",
-                          row.name === selectedSector ? "bg-[#f48945]" : "bg-[#0B2545]",
+                          selectedSector !== "" && row.name === selectedSector
+                            ? "bg-[#f48945]"
+                            : "bg-[#0B2545]",
                         )}
                         style={{ width: `${Math.min(100, row.percentage)}%` }}
                       />

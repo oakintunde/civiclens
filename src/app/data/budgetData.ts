@@ -82,6 +82,30 @@ export function getFederalBudgetForYear(year: number): FederalBudgetSnapshot {
   return { year, total, perCapita, yoyPercent, categories };
 }
 
+/**
+ * Aggregate KPIs across `federalBudgetHistory` for the federal “All Year” default
+ * (before a fiscal year is selected).
+ */
+export function getFederalBudgetAllYearsSummary(): {
+  averageTotal: number;
+  averagePerCapita: number;
+  periodGrowthPercent: number;
+} {
+  const history = federalBudgetHistory;
+  const n = history.length;
+  const averageTotal = history.reduce((s, h) => s + h.total, 0) / n;
+  let sumPc = 0;
+  for (const h of history) {
+    sumPc += getFederalBudgetForYear(h.year).perCapita;
+  }
+  const averagePerCapita = Math.round(sumPc / n);
+  const first = history[0]!;
+  const last = history[n - 1]!;
+  const periodGrowthPercent =
+    first.total > 0 ? ((last.total - first.total) / first.total) * 100 : 0;
+  return { averageTotal, averagePerCapita, periodGrowthPercent };
+}
+
 export function formatBillions(amount: number): string {
   return `$${(amount / 1e9).toFixed(2)}B`;
 }
