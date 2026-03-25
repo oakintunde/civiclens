@@ -1,7 +1,12 @@
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import * as React from "react";
-import { BUDGET_LEVEL_OPTIONS, type BudgetLevel, getBudgetApiBase, toBudgetLevelParam } from "../lib/budgetApi";
 import { cn } from "../components/ui/utils";
+import {
+  getFederalBudgetForYear,
+  getMunicipalBudgetsForYear,
+  provincialBudgets2025,
+} from "../data/budgetData";
+import { BUDGET_LEVEL_OPTIONS, type BudgetLevel, getBudgetApiBase, toBudgetLevelParam } from "../lib/budgetApi";
 import { navButtonBase } from "../lib/navButtonStyles";
 
 const SHARE_LINKS = [
@@ -16,8 +21,8 @@ type InfographicItem = {
   title: string;
   subtitle: string;
   dateLabel: string;
+  amount: number;
   imageSrc: string;
-  body: string;
 };
 
 function pickAccent(level: BudgetLevel): string {
@@ -35,10 +40,16 @@ function svgEscape(text: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function makeInfographicImage(title: string, subtitle: string, body: string, accent: string): string {
+function formatAmountShort(amount: number): string {
+  if (amount >= 1e9) return `$${(amount / 1e9).toFixed(2)}B`;
+  if (amount >= 1e6) return `$${(amount / 1e6).toFixed(0)}M`;
+  return `$${Math.round(amount).toLocaleString("en-CA")}`;
+}
+
+function makeInfographicImage(title: string, subtitle: string, amount: number, accent: string): string {
   const safeTitle = svgEscape(title).slice(0, 42);
-  const safeSubtitle = svgEscape(subtitle).slice(0, 40);
-  const safeBody = svgEscape(body).slice(0, 110);
+  const safeSubtitle = svgEscape(subtitle).slice(0, 42);
+  const amountLabel = formatAmountShort(amount);
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='640' height='420' viewBox='0 0 640 420'>
 <defs>
 <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
@@ -50,60 +61,84 @@ function makeInfographicImage(title: string, subtitle: string, body: string, acc
 <rect x='24' y='24' width='592' height='58' rx='10' fill='rgba(255,255,255,0.08)'/>
 <text x='40' y='61' fill='white' font-size='22' font-family='Arial, sans-serif' font-weight='700'>${safeTitle}</text>
 <text x='40' y='113' fill='#d6e4ef' font-size='16' font-family='Arial, sans-serif'>${safeSubtitle}</text>
-<text x='40' y='164' fill='white' font-size='26' font-family='Arial, sans-serif' font-weight='700'>DATA DETAILS</text>
-<rect x='40' y='196' width='560' height='1' fill='rgba(255,255,255,0.16)'/>
-<text x='40' y='236' fill='white' font-size='16' font-family='Arial, sans-serif'>${safeBody}</text>
-<rect x='40' y='316' width='220' height='14' rx='7' fill='rgba(255,255,255,0.2)'/>
-<rect x='40' y='316' width='110' height='14' rx='7' fill='${accent}'/>
-<circle cx='540' cy='290' r='54' fill='rgba(255,255,255,0.1)'/>
-<circle cx='540' cy='290' r='40' fill='${accent}'/>
-<text x='505' y='295' fill='white' font-size='14' font-family='Arial, sans-serif' font-weight='700'>MCP</text>
+<text x='40' y='164' fill='white' font-size='48' font-family='Arial, sans-serif' font-weight='700'>${amountLabel}</text>
+<rect x='40' y='220' width='420' height='18' rx='9' fill='rgba(255,255,255,0.18)'/>
+<rect x='40' y='220' width='160' height='18' rx='9' fill='${accent}'/>
+<rect x='40' y='258' width='280' height='16' rx='8' fill='rgba(255,255,255,0.18)'/>
+<rect x='40' y='258' width='220' height='16' rx='8' fill='#8ab6d6'/>
+<circle cx='560' cy='300' r='64' fill='rgba(255,255,255,0.08)'/>
+<circle cx='560' cy='300' r='46' fill='${accent}'/>
+<text x='528' y='307' fill='white' font-size='16' font-family='Arial, sans-serif' font-weight='700'>BUDGET</text>
 </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-type GlamaServerResponse = {
-  name?: string;
-  namespace?: string;
-  description?: string;
-  attributes?: string[];
-};
-
 const ALL_CATEGORIES_OPTION = "All";
 
-function buildInfographicItems(
-  glama: GlamaServerResponse,
-  level: BudgetLevel,
-  year: string,
-  category: string,
-): InfographicItem[] {
+function buildProvinceBudgetsForYear(year: number) {
+  const base = 2025;
+  const t = year - base;
+  const factor = 1 + t * 0.012;
+  return provincialBudgets2025.map((p) => ({
+    ...p,
+    total: Math.round(p.total * factor),
+    perCapita: Math.round(p.perCapita * factor),
+    topCategories: p.topCategories.map((c) => ({ ...c, amount: Math.round(c.amount * factor) })),
+  }));
+}
+
+function buildInfographicItems(level: BudgetLevel, year: string, category: string): InfographicItem[] {
   const accent = pickAccent(level);
   const isAll = !category || category === ALL_CATEGORIES_OPTION;
-  const subtitle = isAll ? `${level} • All categories` : `${level} • ${category}`;
-  const dateLabel = `${year} • Infographics`;
-  const baseName = glama.name ?? "Government of Canada Open Data MCP Servers";
-  const body = glama.description ?? "No description provided by the Glama MCP server listing.";
-  const attrs = Array.isArray(glama.attributes) && glama.attributes.length > 0 ? glama.attributes : ["MCP server attributes"];
+  const y = parseInt(year, 10) || 2025;
+  const dateLabel = `${y} • Infographics`;
 
-  const overview: InfographicItem = {
-    id: `overview-${level}`,
-    title: baseName,
-    subtitle,
-    dateLabel,
-    imageSrc: makeInfographicImage(baseName, subtitle, body, accent),
-    body,
-  };
+  if (level === "Federal") {
+    const snap = getFederalBudgetForYear(y);
+    const list = snap.categories
+      .filter((c) => isAll || c.name === category)
+      .sort((a, b) => b.amount - a.amount);
+    return list.slice(0, 9).map((c, idx) => ({
+      id: `fed-${c.name}-${idx}`,
+      title: c.name,
+      subtitle: isAll ? "Federal spending category" : `Federal spending: ${c.name}`,
+      dateLabel,
+      amount: c.amount,
+      imageSrc: makeInfographicImage(c.name, isAll ? "Federal spending category" : c.name, c.amount, accent),
+    }));
+  }
 
-  const attrItems: InfographicItem[] = attrs.slice(0, 8).map((attr, idx) => ({
-    id: `attr-${idx}-${attr}`,
-    title: attr,
-    subtitle,
-    dateLabel,
-    imageSrc: makeInfographicImage(attr, subtitle, body, accent),
-    body,
-  }));
+  if (level === "Province") {
+    const budgets = buildProvinceBudgetsForYear(y);
+    const rows = budgets.flatMap((p) =>
+      p.topCategories
+        .filter((c) => isAll || c.name === category)
+        .map((c, idx) => ({
+          id: `prov-${p.province}-${c.name}-${idx}`,
+          title: `${p.province} - ${c.name}`,
+          subtitle: isAll ? "Provincial spending category" : `Provincial spending: ${c.name}`,
+          dateLabel,
+          amount: c.amount,
+          imageSrc: makeInfographicImage(`${p.province}`, c.name, c.amount, accent),
+        })),
+    );
+    return rows.sort((a, b) => b.amount - a.amount).slice(0, 9);
+  }
 
-  return [overview, ...attrItems].slice(0, 9);
+  const cities = getMunicipalBudgetsForYear(y);
+  const rows = cities.flatMap((m) =>
+    m.topCategories
+      .filter((c) => isAll || c.name === category)
+      .map((c, idx) => ({
+        id: `mun-${m.city}-${c.name}-${idx}`,
+        title: `${m.city} - ${c.name}`,
+        subtitle: isAll ? "Municipal spending category" : `Municipal spending: ${c.name}`,
+        dateLabel,
+        amount: c.amount,
+        imageSrc: makeInfographicImage(`${m.city}`, c.name, c.amount, accent),
+      })),
+  );
+  return rows.sort((a, b) => b.amount - a.amount).slice(0, 9);
 }
 
 export default function Infographics() {
@@ -114,36 +149,7 @@ export default function Infographics() {
   const [categoryOptions, setCategoryOptions] = React.useState<string[]>([]);
   const [yearsLoading, setYearsLoading] = React.useState(false);
   const [categoriesLoading, setCategoriesLoading] = React.useState(false);
-  const [glamaServer, setGlamaServer] = React.useState<GlamaServerResponse | null>(null);
-  const [glamaLoading, setGlamaLoading] = React.useState(true);
-  const [glamaError, setGlamaError] = React.useState<string | null>(null);
   const [expandedItem, setExpandedItem] = React.useState<InfographicItem | null>(null);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    const endpoint = "https://glama.ai/api/mcp/v1/servers/krunal16-c/gov-ca-mcp";
-    setGlamaLoading(true);
-    setGlamaError(null);
-
-    fetch(endpoint)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch Glama MCP server listing");
-        return res.json() as Promise<GlamaServerResponse>;
-      })
-      .then((data) => {
-        if (!cancelled) setGlamaServer(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setGlamaError(String(err ?? "Unknown error"));
-      })
-      .finally(() => {
-        if (!cancelled) setGlamaLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -210,10 +216,10 @@ export default function Infographics() {
     setCategory((prev) => (categoryOptions.includes(prev) ? prev : categoryOptions[0]!));
   }, [categoryOptions]);
 
-  const infographicItems = React.useMemo(() => {
-    if (!glamaServer) return [];
-    return buildInfographicItems(glamaServer, level, year, category);
-  }, [glamaServer, level, year, category]);
+  const infographicItems = React.useMemo(
+    () => buildInfographicItems(level, year, category),
+    [level, year, category],
+  );
 
   return (
     <div style={{ fontFamily: "Poppins, sans-serif" }}>
@@ -384,18 +390,10 @@ export default function Infographics() {
         </div>
       ) : null}
 
-      {glamaLoading && glamaServer == null ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-          <div className="rounded-xl border-2 px-5 py-12 text-center text-gray-600" style={{ borderColor: "#e8eef5" }}>
-            Loading infographic data…
-          </div>
-        </div>
-      ) : null}
-
-      {!glamaLoading && glamaServer == null && glamaError ? (
+      {infographicItems.length === 0 ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
           <div className="rounded-xl border-2 px-5 py-8 text-center text-gray-600" style={{ borderColor: "#e8eef5" }} role="status">
-            Failed to load Glama infographic data.
+            No infographic cards available for the selected filters.
           </div>
         </div>
       ) : null}
