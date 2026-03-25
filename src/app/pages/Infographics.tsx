@@ -1,14 +1,14 @@
-import { Facebook, Linkedin, Mail, Twitter } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import * as React from "react";
 import { BUDGET_LEVEL_OPTIONS, type BudgetLevel, getBudgetApiBase, toBudgetLevelParam } from "../lib/budgetApi";
 import { cn } from "../components/ui/utils";
 import { navButtonBase } from "../lib/navButtonStyles";
 
 const SHARE_LINKS = [
-  { name: "Email", href: "mailto:?subject=CivicLens Infographics&body=https://civiclens.ca/infographics", Icon: Mail },
   { name: "Facebook", href: "https://www.facebook.com/sharer/sharer.php?u=https://civiclens.ca/infographics", Icon: Facebook },
+  { name: "Instagram", href: "https://www.instagram.com/", Icon: Instagram },
   { name: "X", href: "https://x.com/intent/tweet?url=https://civiclens.ca/infographics&text=Infographics", Icon: Twitter },
-  { name: "LinkedIn", href: "https://www.linkedin.com/sharing/share-offsite/?url=https://civiclens.ca", Icon: Linkedin },
+  { name: "LinkedIn", href: "https://www.linkedin.com/sharing/share-offsite/?url=https://civiclens.ca/infographics", Icon: Linkedin },
 ];
 
 type InfographicItem = {
@@ -232,7 +232,7 @@ export default function Infographics() {
                 Infographics
               </h1>
               <p className="text-base md:text-lg text-white/90">
-                We turn complex public finance data into clear, visual stories that make budgets easier to understand.
+                We pioneered the art of using data and design to simplify the budget
               </p>
             </div>
 
