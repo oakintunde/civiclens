@@ -156,6 +156,7 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
+/* eslint-disable react-refresh/only-export-components -- shadcn: exports useFormField hook */
 export {
   Form, FormControl,
   FormDescription, FormField, FormItem,

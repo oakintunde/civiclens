@@ -44,4 +44,5 @@ function Toggle({
   );
 }
 
+/* eslint-disable react-refresh/only-export-components -- shadcn: exports toggleVariants */
 export { Toggle, toggleVariants };

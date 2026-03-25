@@ -155,6 +155,7 @@ function NavigationMenuIndicator({
   );
 }
 
+/* eslint-disable react-refresh/only-export-components -- shadcn: exports navigationMenuTriggerStyle */
 export {
   NavigationMenu, NavigationMenuContent, NavigationMenuIndicator, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle, NavigationMenuViewport
 };

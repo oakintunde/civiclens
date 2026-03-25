@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router";
 import { FederalBudgetDashboard } from "../components/FederalBudgetDashboard";
 import { MunicipalBudgetDashboard } from "../components/MunicipalBudgetDashboard";
 import { ProvincialBudgetDashboard } from "../components/ProvincialBudgetDashboard";
+import { SharePageSocialRow } from "../components/SharePageSocialRow";
 import { cn } from "../components/ui/utils";
 import {
   FEDERAL_CATEGORY_NAMES,
@@ -44,6 +45,12 @@ const PROVINCE_OPTIONS = [
   "Saskatchewan",
 ] as const;
 const ALL_MUNICIPALS = "All Municipalities";
+
+function spendingsLevelQuery(level: BudgetLevel): "federal" | "province" | "municipal" {
+  if (level === "Federal") return "federal";
+  if (level === "Province") return "province";
+  return "municipal";
+}
 
 export default function Spendings() {
   const [searchParams] = useSearchParams();
@@ -193,6 +200,12 @@ export default function Spendings() {
         ? "Compare provincial government spending across Canada's provinces and territories"
         : "Explore how major Canadian cities allocate budgets for local services and infrastructure.";
 
+  const sharePageUrl = React.useMemo(() => {
+    const base =
+      typeof window !== "undefined" ? window.location.origin : "https://civiclens.ca";
+    return `${base}/spendings?level=${spendingsLevelQuery(level)}`;
+  }, [level]);
+
   return (
     <div style={{ fontFamily: "Poppins, sans-serif" }}>
       <section
@@ -201,15 +214,21 @@ export default function Spendings() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1
-            className="text-4xl md:text-5xl font-bold text-white mb-2"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
-            {title}
-          </h1>
-          <p className="text-base md:text-lg text-white/90 max-w-3xl">
-            {subtitle}
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div className="max-w-3xl">
+              <h1
+                className="text-4xl md:text-5xl font-bold text-white mb-2"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                {title}
+              </h1>
+              <p className="text-base md:text-lg text-white/90">{subtitle}</p>
+            </div>
+            <SharePageSocialRow
+              pageUrl={sharePageUrl}
+              shareTitle={`CivicLens — ${title}`}
+            />
+          </div>
         </div>
       </section>
 
