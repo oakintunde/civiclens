@@ -23,8 +23,6 @@ export const router = createBrowserRouter([
       { path: "provincial", Component: ProvincialBudgets },
       { path: "municipal", Component: MunicipalBudgets },
       { path: "comparison", Component: YearComparison },
-      { path: "maps", Component: Maps },
-      { path: "visualizations", Component: Visualizations },
       { path: "spendings", Component: Spendings },
       { path: "about-us", Component: AboutUs },
       { path: "blog", Component: Blog },
