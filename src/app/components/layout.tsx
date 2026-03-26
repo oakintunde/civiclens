@@ -1,20 +1,16 @@
 import {
-  BarChart3,
   BookOpen,
-  ChevronDown,
   Home,
   Info,
   Mail,
   Wallet,
 } from "lucide-react";
-import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import logo from "../../assets/logo_civic_lens.png";
 import { Footer } from "./footer";
 
 export function Layout() {
   const location = useLocation();
-  const [isInteractivesOpen, setIsInteractivesOpen] = useState(false);
 
   const isActive = (path: string) => {
     if (path === "/" && location.pathname === "/") return true;
@@ -28,9 +24,6 @@ export function Layout() {
     { path: "/blog", label: "Blog", icon: BookOpen },
     { path: "/contact-us", label: "Contact Us", icon: Mail },
   ];
-  const isInteractivesActive =
-    isActive("/maps") || isActive("/infographics") || isActive("/visualizations");
-
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "Poppins, sans-serif" }}>
       <header
@@ -62,93 +55,6 @@ export function Layout() {
                 <Home className="w-4 h-4" />
                 <span className="text-sm font-medium">Home</span>
               </Link>
-
-              <div
-                className="relative"
-                onMouseEnter={() => setIsInteractivesOpen(true)}
-                onMouseLeave={() => setIsInteractivesOpen(false)}
-              >
-                <button
-                  type="button"
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    isInteractivesActive ? "text-white" : "text-gray-700 hover:text-white"
-                  }`}
-                  onClick={() => setIsInteractivesOpen((open) => !open)}
-                  onMouseEnter={(e) => {
-                    if (!isInteractivesActive) e.currentTarget.style.backgroundColor = "#f48945";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isInteractivesActive) e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                  style={{
-                    fontFamily: "Montserrat, sans-serif",
-                    backgroundColor: isInteractivesActive ? "#0B2545" : "transparent",
-                  }}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  <span className="text-sm font-medium">Interactives</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-
-                {isInteractivesOpen && (
-                  <div className="absolute top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 min-w-[190px] z-50 overflow-hidden">
-                    <Link
-                      to="/maps"
-                      className={`block px-4 py-2 text-sm transition-colors ${
-                        isActive("/maps") ? "text-white" : "text-gray-700 hover:text-white"
-                      }`}
-                      onMouseEnter={(e) => {
-                        if (!isActive("/maps")) e.currentTarget.style.backgroundColor = "#f48945";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive("/maps")) e.currentTarget.style.backgroundColor = "transparent";
-                      }}
-                      style={{
-                        fontFamily: "Montserrat, sans-serif",
-                        backgroundColor: isActive("/maps") ? "#0B2545" : "transparent",
-                      }}
-                    >
-                      Maps
-                    </Link>
-                    <Link
-                      to="/infographics"
-                      className={`block px-4 py-2 text-sm transition-colors ${
-                        isActive("/infographics") ? "text-white" : "text-gray-700 hover:text-white"
-                      }`}
-                      onMouseEnter={(e) => {
-                        if (!isActive("/infographics")) e.currentTarget.style.backgroundColor = "#f48945";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive("/infographics")) e.currentTarget.style.backgroundColor = "transparent";
-                      }}
-                      style={{
-                        fontFamily: "Montserrat, sans-serif",
-                        backgroundColor: isActive("/infographics") ? "#0B2545" : "transparent",
-                      }}
-                    >
-                      Infographics
-                    </Link>
-                    <Link
-                      to="/visualizations"
-                      className={`block px-4 py-2 text-sm transition-colors ${
-                        isActive("/visualizations") ? "text-white" : "text-gray-700 hover:text-white"
-                      }`}
-                      onMouseEnter={(e) => {
-                        if (!isActive("/visualizations")) e.currentTarget.style.backgroundColor = "#f48945";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive("/visualizations")) e.currentTarget.style.backgroundColor = "transparent";
-                      }}
-                      style={{
-                        fontFamily: "Montserrat, sans-serif",
-                        backgroundColor: isActive("/visualizations") ? "#0B2545" : "transparent",
-                      }}
-                    >
-                      Visualizations
-                    </Link>
-                  </div>
-                )}
-              </div>
 
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -191,19 +97,6 @@ export function Layout() {
             >
               <Home className="w-4 h-4" />
               <span className="text-sm font-medium">Home</span>
-            </Link>
-            <Link
-              to="/maps"
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                isInteractivesActive ? "text-white" : "text-gray-700"
-              }`}
-              style={{
-                fontFamily: "Montserrat, sans-serif",
-                backgroundColor: isInteractivesActive ? "#0B2545" : "transparent",
-              }}
-            >
-              <BarChart3 className="w-4 h-4" />
-              <span className="text-sm font-medium">Interactives</span>
             </Link>
             {navItems.map((item) => {
               const Icon = item.icon;

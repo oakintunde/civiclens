@@ -1,10 +1,10 @@
 import { Download } from "lucide-react";
 import * as React from "react";
+import type { MunicipalBudgetRow } from "../data/budgetData";
 import { buildBudgetInfographicDataset } from "../infographics/budgetInfographicDataset";
 import { renderBudgetInfographicSvg } from "../infographics/renderBudgetInfographicSvg";
 import { downloadSvgAsPng } from "../infographics/svgToPng";
 import type { BudgetLevel } from "../lib/budgetApi";
-import type { MunicipalBudgetRow } from "../data/budgetData";
 import { navButtonBase } from "../lib/navButtonStyles";
 import { cn } from "./ui/utils";
 

@@ -10,11 +10,8 @@ import {
 } from "./pages/budgetPlaceholders";
 import ContactUs from "./pages/Contact";
 import { Home } from "./pages/Home";
-import Infographics from "./pages/Infographics";
-import Maps from "./pages/Maps";
 import NotFound from "./pages/NotFound";
 import Spendings from "./pages/Spendings";
-import Visualizations from "./pages/Visualization";
 
 export const router = createBrowserRouter([
   {
@@ -27,7 +24,6 @@ export const router = createBrowserRouter([
       { path: "municipal", Component: MunicipalBudgets },
       { path: "comparison", Component: YearComparison },
       { path: "maps", Component: Maps },
-      { path: "infographics", Component: Infographics },
       { path: "visualizations", Component: Visualizations },
       { path: "spendings", Component: Spendings },
       { path: "about-us", Component: AboutUs },
