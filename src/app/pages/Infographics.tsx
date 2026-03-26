@@ -1,5 +1,6 @@
 import * as React from "react";
 import { BudgetFiltersCard } from "../components/BudgetFiltersCard";
+import { BudgetInfographicPanel } from "../components/BudgetInfographicPanel";
 import { SharePageSocialRow } from "../components/SharePageSocialRow";
 import { useBudgetFiltersState } from "../hooks/useBudgetFiltersState";
 
@@ -38,6 +39,15 @@ export default function Infographics() {
       </section>
 
       <BudgetFiltersCard {...filters} />
+
+      <BudgetInfographicPanel
+        level={filters.level}
+        year={filters.year}
+        sector={filters.sector}
+        province={filters.province}
+        municipalSelection={filters.municipalSelection}
+        municipalRows={filters.municipalRows}
+      />
     </div>
   );
 }
