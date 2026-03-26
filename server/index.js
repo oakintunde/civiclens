@@ -252,7 +252,23 @@ app.get("/api/news", async (req, res) => {
       return res.status(500).json({ error: "Failed to fetch news" });
     }
 
-    const data = await response.json();
+    let data = await response.json();
+
+    // If the domain filter is too strict and returns no results,
+    // retry without domains so the blog page isn't empty.
+    if (data && typeof data.totalResults === "number" && data.totalResults === 0) {
+      try {
+        const retryUrl = new URL(url.toString());
+        retryUrl.searchParams.delete("domains");
+        const retryRes = await fetch(retryUrl.toString());
+        if (retryRes.ok) {
+          const retryData = await retryRes.json();
+          data = retryData;
+        }
+      } catch {
+        /* ignore retry errors, keep initial response */
+      }
+    }
 
     res.json({
       articles: data.articles ?? [],

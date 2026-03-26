@@ -32,9 +32,15 @@ type BlogPost = {
 
 /** Keep only headlines that clearly mention “budget” (client-side clean). */
 function filterBudgetArticles(articles: NewsApiArticle[]): NewsApiArticle[] {
-  return articles.filter((article) =>
-    (article.title ?? "").toLowerCase().includes("budget"),
-  );
+  const filtered = articles.filter((article) => {
+    const title = (article.title ?? "").toLowerCase();
+    const desc = (article.description ?? "").toLowerCase();
+    return title.includes("budget") || desc.includes("budget");
+  });
+
+  // Fallback: if nothing matches the heuristic, show whatever the server returned
+  // so the blog page doesn't appear empty.
+  return filtered.length > 0 ? filtered : articles;
 }
 
 /** Infer scope from headline keywords (wireframe logic). */
