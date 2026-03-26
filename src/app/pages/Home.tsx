@@ -8,14 +8,71 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+import * as React from "react";
 import { Link } from "react-router";
 import { cn } from "../components/ui/utils";
 import { federalBudget2025 } from "../data/budgetData";
 import { navButtonOnDarkOutline, navButtonPrimary } from "../lib/navButtonStyles";
+import { getBudgetApiBase } from "../lib/budgetApi";
 
 export function Home() {
   const totalBudget = federalBudget2025.total;
   const formattedTotal = `$${(totalBudget / 1000000000).toFixed(1)}B`;
+
+  const SUBSCRIBE_API_URL = `${getBudgetApiBase()}/api/subscribe`;
+  const [subscriberName, setSubscriberName] = React.useState("");
+  const [subscriberEmail, setSubscriberEmail] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+  const [resultMessage, setResultMessage] = React.useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  const validate = () => {
+    const name = subscriberName.trim();
+    const email = subscriberEmail.trim().toLowerCase();
+    if (!name || name.length < 2) return "Please enter your name.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email address.";
+    return null;
+  };
+
+  const onSubmitSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setResultMessage(null);
+
+    const validationError = validate();
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(SUBSCRIBE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: subscriberName, email: subscriberEmail }),
+      });
+
+      const data = (await res.json().catch(() => ({}))) as
+        | { ok?: boolean; alreadySubscribed?: boolean; message?: string; error?: string }
+        | { error?: string };
+
+      if (!res.ok) {
+        setErrorMessage((data as { error?: string }).error ?? "Subscription failed.");
+        return;
+      }
+
+      setResultMessage(data.message ?? "Thank you for subscribing!");
+      if (!data.alreadySubscribed) {
+        setSubscriberName("");
+        setSubscriberEmail("");
+      }
+    } catch {
+      setErrorMessage("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div style={{ fontFamily: "Poppins, sans-serif" }}>
@@ -365,10 +422,12 @@ export function Home() {
 
               {/* Right Side - Form */}
               <div>
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={onSubmitSubscribe}>
                   <input
                     type="text"
                     placeholder="First Name"
+                    value={subscriberName}
+                    onChange={(e) => setSubscriberName(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
                     style={{
                       borderColor: "#d1d5db",
@@ -385,6 +444,8 @@ export function Home() {
                   <input
                     type="email"
                     placeholder="Your email address"
+                    value={subscriberEmail}
+                    onChange={(e) => setSubscriberEmail(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
                     style={{
                       borderColor: "#d1d5db",
@@ -398,9 +459,27 @@ export function Home() {
                       e.currentTarget.style.boxShadow = "none";
                     }}
                   />
-                  <button type="submit" className={cn(navButtonPrimary, "w-full")}>
-                    Subscribe
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className={cn(
+                      navButtonPrimary,
+                      "w-full",
+                      submitting ? "opacity-70 cursor-not-allowed" : "",
+                    )}
+                  >
+                    {submitting ? "Subscribing…" : "Subscribe"}
                   </button>
+                  {resultMessage ? (
+                    <p className="text-sm font-semibold text-[#0B2545] mt-2">
+                      {resultMessage}
+                    </p>
+                  ) : null}
+                  {errorMessage ? (
+                    <p className="text-sm font-semibold text-red-600 mt-2">
+                      {errorMessage}
+                    </p>
+                  ) : null}
                   <p className="text-xs text-gray-500 mt-3">
                     Entering your name, email address and clicking &quot;Subscribe&quot; means you agree to receive
                     updates about the work we do at CivicLens. The CivicLens will never spam you. Please,{" "}

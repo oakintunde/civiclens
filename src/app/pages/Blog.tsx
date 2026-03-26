@@ -2,6 +2,7 @@ import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, Newspaper } from "lu
 import * as React from "react";
 import { cn } from "../components/ui/utils";
 import { navButtonPrimary } from "../lib/navButtonStyles";
+import { getBudgetApiBase } from "../lib/budgetApi";
 
 type NewsApiArticle = {
   source?: { name?: string };
@@ -108,6 +109,62 @@ export default function Blog() {
   const [error, setError] = React.useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+
+  const SUBSCRIBE_API_URL = `${getBudgetApiBase()}/api/subscribe`;
+  const [subscriberName, setSubscriberName] = React.useState("");
+  const [subscriberEmail, setSubscriberEmail] = React.useState("");
+  const [subscribeSubmitting, setSubscribeSubmitting] = React.useState(false);
+  const [subscribeResultMessage, setSubscribeResultMessage] = React.useState<string | null>(null);
+  const [subscribeErrorMessage, setSubscribeErrorMessage] = React.useState<string | null>(null);
+
+  const validateSubscribe = () => {
+    const name = subscriberName.trim();
+    const email = subscriberEmail.trim().toLowerCase();
+    if (!name || name.length < 2) return "Please enter your name.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "Please enter a valid email address.";
+    return null;
+  };
+
+  const onSubmitSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubscribeErrorMessage(null);
+    setSubscribeResultMessage(null);
+
+    const validationError = validateSubscribe();
+    if (validationError) {
+      setSubscribeErrorMessage(validationError);
+      return;
+    }
+
+    setSubscribeSubmitting(true);
+    try {
+      const res = await fetch(SUBSCRIBE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: subscriberName, email: subscriberEmail }),
+      });
+
+      const data = (await res.json().catch(() => ({}))) as
+        | { alreadySubscribed?: boolean; message?: string; error?: string }
+        | { error?: string };
+
+      if (!res.ok) {
+        setSubscribeErrorMessage((data as { error?: string }).error ?? "Subscription failed.");
+        return;
+      }
+
+      setSubscribeResultMessage(data.message ?? "Thank you for subscribing!");
+      if (!data.alreadySubscribed) {
+        setSubscriberName("");
+        setSubscriberEmail("");
+      }
+    } catch {
+      setSubscribeErrorMessage("Network error. Please try again.");
+    } finally {
+      setSubscribeSubmitting(false);
+    }
+  };
 
   React.useEffect(() => {
     let cancelled = false;
@@ -345,10 +402,12 @@ export default function Blog() {
               </div>
 
               <div>
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={onSubmitSubscribe}>
                   <input
                     type="text"
                     placeholder="First Name"
+                    value={subscriberName}
+                    onChange={(e) => setSubscriberName(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
                     style={{
                       borderColor: "#d1d5db",
@@ -365,6 +424,8 @@ export default function Blog() {
                   <input
                     type="email"
                     placeholder="Your email address"
+                    value={subscriberEmail}
+                    onChange={(e) => setSubscriberEmail(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
                     style={{
                       borderColor: "#d1d5db",
@@ -378,9 +439,27 @@ export default function Blog() {
                       e.currentTarget.style.boxShadow = "none";
                     }}
                   />
-                  <button type="submit" className={cn(navButtonPrimary, "w-full")}>
-                    Subscribe
+                  <button
+                    type="submit"
+                    disabled={subscribeSubmitting}
+                    className={cn(
+                      navButtonPrimary,
+                      "w-full",
+                      subscribeSubmitting ? "opacity-70 cursor-not-allowed" : "",
+                    )}
+                  >
+                    {subscribeSubmitting ? "Subscribing…" : "Subscribe"}
                   </button>
+                  {subscribeResultMessage ? (
+                    <p className="text-sm font-semibold text-[#0B2545] mt-2">
+                      {subscribeResultMessage}
+                    </p>
+                  ) : null}
+                  {subscribeErrorMessage ? (
+                    <p className="text-sm font-semibold text-red-600 mt-2">
+                      {subscribeErrorMessage}
+                    </p>
+                  ) : null}
                   <p className="text-xs text-gray-500 mt-3">
                     Entering your name, email address and clicking &quot;Subscribe&quot; means you agree to receive
                     updates about the work we do at CivicLens. The CivicLens will never spam you. Please,{" "}

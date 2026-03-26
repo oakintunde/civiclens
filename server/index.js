@@ -1,8 +1,9 @@
 import cors from "cors";
 import express from "express";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import nodemailer from "nodemailer";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MUNICIPAL_BUDGETS_BASE = JSON.parse(
@@ -29,6 +30,77 @@ function scaleMunicipalBudgets(year, baseRows) {
 
 const app = express();
 app.use(cors());
+app.use(express.json({ limit: "1mb" }));
+
+const SUBSCRIBERS_FILE = join(__dirname, "subscribers.json");
+
+function loadSubscribers() {
+  if (!existsSync(SUBSCRIBERS_FILE)) return { subscribers: [] };
+  try {
+    const raw = readFileSync(SUBSCRIBERS_FILE, "utf8");
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.subscribers)) return { subscribers: [] };
+    return parsed;
+  } catch {
+    return { subscribers: [] };
+  }
+}
+
+function saveSubscribers(data) {
+  writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(data, null, 2), "utf8");
+}
+
+function normalizeEmail(email) {
+  return String(email ?? "").trim().toLowerCase();
+}
+
+function isValidEmail(email) {
+  const e = normalizeEmail(email);
+  // Simple pragmatic validation for UI submissions.
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+function createTransporter() {
+  const host = process.env.SMTP_HOST;
+  if (!host) return null;
+
+  const port = parseInt(String(process.env.SMTP_PORT ?? "587"), 10) || 587;
+  const secure = port === 465;
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: process.env.SMTP_USER
+      ? {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS ?? "",
+        }
+      : undefined,
+  });
+}
+
+async function sendSubscriptionEmail({ name, email }) {
+  const transporter = createTransporter();
+  if (!transporter) {
+    // No SMTP config in env; still treat subscription as successful.
+    console.log("[subscribe] SMTP not configured; skipping email send.");
+    return false;
+  }
+
+  const from = process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "no-reply@civiclens.ca";
+  const subject = "Subscription confirmed — CivicLens";
+  const safeName = String(name ?? "").trim() || "there";
+  const text = `Hi ${safeName},\n\nThanks for subscribing to CivicLens updates!\n\nYou can reply to this email if you have questions.\n\n— CivicLens`;
+
+  await transporter.sendMail({
+    from,
+    to: email,
+    subject,
+    text,
+  });
+  return true;
+}
 
 // NewsAPI key (also override with NEWS_API_KEY env in production)
 const NEWS_API_KEY =
@@ -113,6 +185,53 @@ app.get("/api/municipal-budgets", (req, res) => {
   const year = Math.min(2100, Math.max(2000, parseInt(raw, 10) || 2025));
   const cities = scaleMunicipalBudgets(year, MUNICIPAL_BUDGETS_BASE);
   res.json({ year, cities });
+});
+
+app.post("/api/subscribe", async (req, res) => {
+  try {
+    const { name, email } = req.body ?? {};
+    const normalizedEmail = normalizeEmail(email);
+    const normalizedName = String(name ?? "").trim();
+
+    if (!normalizedName || normalizedName.length < 2) {
+      return res.status(400).json({ error: "Please enter your name." });
+    }
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({ error: "Please enter a valid email address." });
+    }
+
+    const data = loadSubscribers();
+    const existing = data.subscribers.find((s) => normalizeEmail(s.email) === normalizedEmail);
+    if (existing) {
+      return res.json({
+        ok: true,
+        alreadySubscribed: true,
+        message: "Thank you, we already have your email address*.",
+      });
+    }
+
+    data.subscribers.push({
+      name: normalizedName,
+      email: normalizedEmail,
+      createdAt: new Date().toISOString(),
+    });
+    saveSubscribers(data);
+
+    // Best-effort email confirmation (does not block subscription storage).
+    try {
+      await sendSubscriptionEmail({ name: normalizedName, email: normalizedEmail });
+    } catch (err) {
+      console.error("[subscribe] Failed to send email:", err);
+    }
+
+    return res.json({
+      ok: true,
+      alreadySubscribed: false,
+      message: "Thank you for subscribing! Please check your email.",
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Subscription failed." });
+  }
 });
 
 app.get("/api/news", async (req, res) => {
