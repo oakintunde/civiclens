@@ -2,11 +2,13 @@ import type { BudgetLevel } from "../lib/budgetApi";
 import {
   getFederalBudgetAllYearsSummary,
   getFederalBudgetForYear,
+  getMunicipalBudgetsForAllYears,
   getMunicipalBudgetsForYear,
   getMunicipalBudgetRow,
   getProvincialBudgetRow,
   MUNICIPAL_CATEGORY_COLORS,
   PROVINCIAL_CATEGORY_COLORS,
+  PROVINCIAL_DATA_YEARS,
   provincialBudgets2025,
   type MunicipalBudgetRow,
 } from "../data/budgetData";
@@ -44,10 +46,13 @@ function yearHeaderParts(yearStr: string): [string, string] {
   return [y.slice(0, 2), y.slice(2)];
 }
 
-function scaleProvincialRows(year: number) {
+function getProvincialAverageScaleFactor() {
   const base = 2025;
-  const t = year - base;
-  const factor = 1 + t * 0.012;
+  const avgT = PROVINCIAL_DATA_YEARS.reduce((s, y) => s + (y - base), 0) / PROVINCIAL_DATA_YEARS.length;
+  return 1 + avgT * 0.012;
+}
+
+function scaleProvincialRowsByFactor(factor: number) {
   return provincialBudgets2025.map((p) => ({
     province: p.province,
     total: Math.round(p.total * factor),
@@ -130,7 +135,9 @@ export function buildBudgetInfographicDataset(params: {
 
   if (level === "Province") {
     const yr = y ?? 2025;
-    const scaled = scaleProvincialRows(yr);
+    const yearLabel = year === "" ? "All Years" : String(yr);
+    const scaleFactor = year === "" ? getProvincialAverageScaleFactor() : 1 + (yr - 2025) * 0.012;
+    const scaled = scaleProvincialRowsByFactor(scaleFactor);
     if (province === "All Provinces") {
       const rows = [...scaled].sort((a, b) => b.total - a.total).slice(0, MAX_BLOCKS);
       const items: InfographicBlock[] = rows.map((r, i) => ({
@@ -144,7 +151,7 @@ export function buildBudgetInfographicDataset(params: {
         headerYearLine1,
         headerYearLine2,
         headline: "PROVINCIAL BUDGETS",
-        subtitle: `Top provinces by total spend — ${yr}`,
+        subtitle: `Top provinces by total spend — ${yearLabel}`,
         totalLabel: "Combined provincial total",
         totalFormatted: formatCompactCad(total),
         unitNote: "Amounts in CAD",
@@ -196,7 +203,13 @@ export function buildBudgetInfographicDataset(params: {
 
   /* Municipal */
   const yr = y ?? 2025;
-  const rows = municipalRows?.length ? municipalRows : getMunicipalBudgetsForYear(yr);
+  const yearLabel = year === "" ? "All Years" : String(yr);
+  const rows =
+    municipalRows?.length
+      ? municipalRows
+      : year === ""
+        ? getMunicipalBudgetsForAllYears()
+        : getMunicipalBudgetsForYear(yr);
   if (municipalSelection === "All Municipalities") {
     const sorted = [...rows].sort((a, b) => b.total - a.total).slice(0, MAX_BLOCKS);
     const items: InfographicBlock[] = sorted.map((r, i) => ({
@@ -210,7 +223,7 @@ export function buildBudgetInfographicDataset(params: {
       headerYearLine1,
       headerYearLine2,
       headline: "MUNICIPAL BUDGETS",
-      subtitle: `Top cities by total spend — ${yr}`,
+      subtitle: `Top cities by total spend — ${yearLabel}`,
       totalLabel: "Combined municipal total",
       totalFormatted: formatCompactCad(total),
       unitNote: "Amounts in CAD",

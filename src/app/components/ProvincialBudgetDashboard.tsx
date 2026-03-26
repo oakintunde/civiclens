@@ -17,6 +17,7 @@ import {
   getHighestSpendCategory,
   getProvincialBudgetRow,
   PROVINCIAL_CATEGORY_COLORS,
+  PROVINCIAL_DATA_YEARS,
   provincialBudgets2025,
 } from "../data/budgetData";
 
@@ -32,8 +33,30 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
   const row = provinceSelection !== ALL_PROVINCES ? getProvincialBudgetRow(provinceSelection) : undefined;
   const showSingleProvince = Boolean(row);
 
+  const hasSelectedSector = selectedSector !== "";
+
+  const yearNumber = year ? Number.parseInt(year, 10) : null;
+  const baseYear = 2025;
+  const scaleForYear = (y: number) => 1 + (y - baseYear) * 0.012;
+  const avgScaleForAllYears =
+    PROVINCIAL_DATA_YEARS.reduce((s, y) => s + scaleForYear(y), 0) / PROVINCIAL_DATA_YEARS.length;
+  const scaleFactor = yearNumber == null ? avgScaleForAllYears : scaleForYear(yearNumber);
+
+  const scaledRow =
+    row == null
+      ? undefined
+      : {
+          ...row,
+          total: Math.round(row.total * scaleFactor),
+          perCapita: Math.round(row.perCapita * scaleFactor),
+          topCategories: row.topCategories.map((c) => ({
+            ...c,
+            amount: Math.round(c.amount * scaleFactor),
+          })),
+        };
+
   const categoriesWithColors =
-    row?.topCategories.map((c) => ({
+    scaledRow?.topCategories.map((c) => ({
       ...c,
       color: PROVINCIAL_CATEGORY_COLORS[c.name] ?? "#64748b",
     })) ?? [];
@@ -47,16 +70,16 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
 
   const comparisonRows = provincialBudgets2025.map((p) => ({
     name: p.province,
-    totalBillions: p.total / 1e9,
-    perCapita: p.perCapita,
+    totalBillions: (p.total * scaleFactor) / 1e9,
+    perCapita: Math.round(p.perCapita * scaleFactor),
   }));
 
   const overviewTableRows = provincialBudgets2025.map((p) => {
     const top = getHighestSpendCategory(p);
     return {
       province: p.province,
-      total: p.total,
-      perCapita: p.perCapita,
+      total: Math.round(p.total * scaleFactor),
+      perCapita: Math.round(p.perCapita * scaleFactor),
       topCategory: `${top.name} (${top.percentage.toFixed(0)}%)`,
     };
   });
@@ -78,7 +101,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
       ) : null}
 
       {/* Single-province: summary + pie + category details */}
-      {showSingleProvince && row ? (
+      {showSingleProvince && scaledRow ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div
@@ -94,7 +117,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
               <div>
                 <p className="text-sm text-gray-600 mb-1">Province</p>
                 <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
-                  {row.province}
+                  {scaledRow.province}
                 </p>
               </div>
             </div>
@@ -111,7 +134,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Budget</p>
                 <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
-                  {formatBillions(row.total)}
+                  {formatBillions(scaledRow.total)}
                 </p>
               </div>
             </div>
@@ -128,7 +151,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
               <div>
                 <p className="text-sm text-gray-600 mb-1">Per Capita</p>
                 <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
-                  ${row.perCapita.toLocaleString("en-CA")}
+                  ${scaledRow.perCapita.toLocaleString("en-CA")}
                 </p>
               </div>
             </div>
@@ -143,9 +166,11 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
                 className="text-lg font-bold text-gray-900 mb-4"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
-                {row.province} Spending Distribution
+                {scaledRow.province} Spending Distribution
               </h3>
-              <p className="text-xs text-gray-500 mb-2">Fiscal year {year} (demo data)</p>
+              <p className="text-xs text-gray-500 mb-2">
+                Fiscal year {yearNumber == null ? "All Year" : yearNumber} (demo data)
+              </p>
               <div className="h-[280px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -163,14 +188,14 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
                       }
                     >
                       {pieData.map((entry) => {
-                        const selected = entry.name === selectedSector;
+                        const selected = hasSelectedSector && entry.name === selectedSector;
                         return (
                           <Cell
                             key={entry.name}
                             fill={entry.color}
-                            fillOpacity={selected ? 1 : 0.35}
-                            stroke={selected ? "#f48945" : "#fff"}
-                            strokeWidth={selected ? 4 : 1}
+                            fillOpacity={hasSelectedSector ? (selected ? 1 : 0.35) : 1}
+                            stroke={hasSelectedSector ? (selected ? "#f48945" : "#fff") : "#fff"}
+                            strokeWidth={hasSelectedSector ? (selected ? 4 : 1) : 1}
                           />
                         );
                       })}
@@ -328,7 +353,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
       </div>
 
       {/* Detailed breakdown — only when a province with data is selected */}
-      {showSingleProvince && row ? (
+      {showSingleProvince && scaledRow ? (
         <div
           className="bg-white rounded-xl border-2 overflow-hidden"
           style={{ borderColor: "#e8eef5" }}
@@ -407,7 +432,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
                     className="px-5 py-4 text-right font-bold text-gray-900"
                     style={{ fontFamily: "Montserrat, sans-serif" }}
                   >
-                    {formatBillions(row.total)}
+                    {formatBillions(scaledRow.total)}
                   </td>
                   <td className="px-5 py-4 text-right font-bold text-gray-900">
                     {detailPctSum.toFixed(1)}%

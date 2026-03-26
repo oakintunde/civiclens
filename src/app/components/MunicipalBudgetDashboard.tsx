@@ -48,6 +48,7 @@ export function MunicipalBudgetDashboard({
   loading,
   municipalSelection = "All Municipalities",
 }: Props) {
+  const hasSelectedSector = selectedSector !== "";
   const isAllMunicipalities = municipalSelection === "All Municipalities";
   const visibleRows = isAllMunicipalities ? rows : rows.filter((r) => r.city === municipalSelection);
 
@@ -254,14 +255,14 @@ export function MunicipalBudgetDashboard({
                       }
                     >
                       {pieData.map((entry) => {
-                        const selected = entry.name === selectedSector;
+                        const selected = hasSelectedSector && entry.name === selectedSector;
                         return (
                           <Cell
                             key={entry.name}
                             fill={entry.color}
-                            fillOpacity={selected ? 1 : 0.35}
-                            stroke={selected ? "#f48945" : "#fff"}
-                            strokeWidth={selected ? 4 : 1}
+                            fillOpacity={hasSelectedSector ? (selected ? 1 : 0.35) : 1}
+                            stroke={hasSelectedSector ? (selected ? "#f48945" : "#fff") : "#fff"}
+                            strokeWidth={hasSelectedSector ? (selected ? 4 : 1) : 1}
                           />
                         );
                       })}
@@ -351,7 +352,9 @@ export function MunicipalBudgetDashboard({
           >
             Total Budget Comparison
           </h3>
-          <p className="text-xs text-gray-500 mb-2">Fiscal year {year} (demo data)</p>
+          <p className="text-xs text-gray-500 mb-2">
+            Fiscal year {year ? year : "All Year"} (demo data)
+          </p>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={comparisonBars} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
@@ -391,7 +394,9 @@ export function MunicipalBudgetDashboard({
           >
             Per Capita Spending
           </h3>
-          <p className="text-xs text-gray-500 mb-2">Fiscal year {year} (demo data)</p>
+          <p className="text-xs text-gray-500 mb-2">
+            Fiscal year {year ? year : "All Year"} (demo data)
+          </p>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={comparisonBars} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>

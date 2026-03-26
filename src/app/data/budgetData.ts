@@ -341,6 +341,27 @@ export function getMunicipalBudgetsForYear(year: number): MunicipalBudgetRow[] {
   }));
 }
 
+export function getMunicipalBudgetsForAllYears(): MunicipalBudgetRow[] {
+  // For the demo dataset, category percentages remain constant while amounts scale linearly
+  // with the year-based factor. So we can average the factors over the available years.
+  const base = 2025;
+  const years = [...MUNICIPAL_DATA_YEARS];
+  const avgT = years.reduce((s, y) => s + (y - base), 0) / years.length;
+  const totalFactor = 1 + avgT * 0.012;
+  const perCapFactor = 1 + avgT * 0.008;
+
+  return municipalBudgets2025.map((row) => ({
+    ...row,
+    total: Math.round(row.total * totalFactor),
+    perCapita: Math.round(row.perCapita * perCapFactor),
+    topCategories: row.topCategories.map((c) => ({
+      ...c,
+      amount: Math.round(c.amount * totalFactor),
+      percentage: c.percentage,
+    })),
+  }));
+}
+
 export function getMunicipalBudgetRow(
   city: string,
   rows: MunicipalBudgetRow[],

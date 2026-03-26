@@ -6,6 +6,7 @@ import {
   FEDERAL_SECTOR_PLACEHOLDER_LABEL,
   FEDERAL_YEAR_PLACEHOLDER_LABEL,
   PROVINCE_OPTIONS,
+  PROV_MUNI_SECTOR_PLACEHOLDER_LABEL,
   type BudgetFiltersState,
 } from "../hooks/useBudgetFiltersState";
 
@@ -57,9 +58,7 @@ export function BudgetFiltersCard({
               aria-busy={yearsLoading}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca] disabled:opacity-60"
             >
-              {level === "Federal" ? (
-                <option value="">{FEDERAL_YEAR_PLACEHOLDER_LABEL}</option>
-              ) : null}
+              <option value="">{FEDERAL_YEAR_PLACEHOLDER_LABEL}</option>
               {yearOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -79,9 +78,11 @@ export function BudgetFiltersCard({
               aria-busy={categoriesLoading}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca] disabled:opacity-60"
             >
-              {level === "Federal" ? (
-                <option value="">{FEDERAL_SECTOR_PLACEHOLDER_LABEL}</option>
-              ) : null}
+              <option value="">
+                {level === "Federal"
+                  ? FEDERAL_SECTOR_PLACEHOLDER_LABEL
+                  : PROV_MUNI_SECTOR_PLACEHOLDER_LABEL}
+              </option>
               {sectorOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}

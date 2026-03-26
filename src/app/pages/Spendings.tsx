@@ -23,8 +23,12 @@ export default function Spendings() {
         ? `Federal Budget ${year}`
         : "Federal Budget"
       : level === "Province"
-        ? `Provincial Budgets ${year}`
-        : `Municipal Budgets ${year}`;
+        ? year
+          ? `Provincial Budgets ${year}`
+          : "Provincial Budgets"
+        : year
+          ? `Municipal Budgets ${year}`
+          : "Municipal Budgets";
   const subtitle =
     level === "Federal"
       ? "Government of Canada spending breakdown and allocation across departments and programs."

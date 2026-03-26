@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router";
 import {
   FEDERAL_CATEGORY_NAMES,
   FEDERAL_DATA_YEARS,
+  getMunicipalBudgetsForAllYears,
   getMunicipalBudgetsForYear,
   MUNICIPAL_CATEGORY_NAMES,
   MUNICIPAL_DATA_YEARS,
@@ -30,6 +31,7 @@ export const ALL_MUNICIPALS = "All Municipalities";
 
 export const FEDERAL_YEAR_PLACEHOLDER_LABEL = "Select Year e.g. 2025";
 export const FEDERAL_SECTOR_PLACEHOLDER_LABEL = "Select Sector e.g. Health Transfers";
+export const PROV_MUNI_SECTOR_PLACEHOLDER_LABEL = "Select Sector e.g. Education";
 
 function fallbackCategoriesForLevel(level: BudgetLevel): string[] {
   if (level === "Federal") return [...FEDERAL_CATEGORY_NAMES];
@@ -69,14 +71,18 @@ export function useBudgetFiltersState(options: UseBudgetFiltersStateOptions = {}
     const raw = searchParams.get("level")?.toLowerCase();
     if (raw === "province" || raw === "provincial") {
       setLevel("Province");
-      setYear(fallbackYearsForLevel("Province")[0] ?? "2025");
-      setSector(fallbackCategoriesForLevel("Province")[0] ?? "");
+      // Default state: "all years" + "all sectors"
+      setYear("");
+      setSector("");
       return;
     }
     if (raw === "municipal" || raw === "municipality") {
       setLevel("Municipal");
-      setYear(fallbackYearsForLevel("Municipal")[0] ?? "2025");
-      setSector(fallbackCategoriesForLevel("Municipal")[0] ?? "");
+      // Default state: "all years" + "all sectors"
+      setYear("");
+      setSector("");
+      setMunicipalRows(getMunicipalBudgetsForAllYears());
+      setMunicipalLoading(false);
       return;
     }
     if (raw === "federal") {
@@ -89,8 +95,18 @@ export function useBudgetFiltersState(options: UseBudgetFiltersStateOptions = {}
   React.useEffect(() => {
     if (level !== "Municipal") return;
     let cancelled = false;
-    const y = parseInt(year, 10) || 2025;
     setMunicipalLoading(true);
+
+    // Default year (empty string) means "All years" in the UI.
+    if (year === "") {
+      setMunicipalRows(getMunicipalBudgetsForAllYears());
+      setMunicipalLoading(false);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const y = parseInt(year, 10) || 2025;
     fetch(`${getBudgetApiBase()}/api/municipal-budgets?year=${y}`)
       .then((res) => {
         if (!res.ok) throw new Error("municipal budgets fetch failed");
@@ -178,7 +194,9 @@ export function useBudgetFiltersState(options: UseBudgetFiltersStateOptions = {}
       return;
     }
     setSector((prev) => {
-      if (prev === "" || !categories.includes(prev)) return categories[0]!;
+      // Province/Municipal default: keep "" so the UI stays on "Select Sector".
+      if (prev === "") return "";
+      if (!categories.includes(prev)) return categories[0]!;
       return prev;
     });
   }, [categories, level]);
@@ -193,13 +211,17 @@ export function useBudgetFiltersState(options: UseBudgetFiltersStateOptions = {}
       return;
     }
     setYear((prev) => {
-      if (prev === "" || !yearOptions.includes(prev)) return yearOptions[0]!;
+      // Province/Municipal default: keep "" so the UI stays on "Select Year".
+      if (prev === "") return "";
+      if (!yearOptions.includes(prev)) return yearOptions[0]!;
       return prev;
     });
   }, [yearOptions, level]);
 
   const municipalOptions = React.useMemo(() => {
-    const rows = municipalRows ?? getMunicipalBudgetsForYear(parseInt(year, 10) || 2025);
+    const rows =
+      municipalRows ??
+      (year === "" ? getMunicipalBudgetsForAllYears() : getMunicipalBudgetsForYear(parseInt(year, 10) || 2025));
     return [ALL_MUNICIPALS, ...rows.map((r) => r.city)];
   }, [municipalRows, year]);
 
@@ -219,10 +241,13 @@ export function useBudgetFiltersState(options: UseBudgetFiltersStateOptions = {}
       setYear("");
       setSector("");
     } else {
-      const yrs = fallbackYearsForLevel(next);
-      setYear(yrs[0] ?? "2025");
-      const cats = fallbackCategoriesForLevel(next);
-      setSector(cats[0] ?? "");
+      // Province/Municipal default: keep placeholders ("all years" + "all sectors")
+      setYear("");
+      setSector("");
+      if (next === "Municipal") {
+        setMunicipalRows(getMunicipalBudgetsForAllYears());
+        setMunicipalLoading(false);
+      }
     }
   }, []);
 
