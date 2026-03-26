@@ -8,6 +8,13 @@ function esc(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function truncateToFit(text: string, maxChars: number): string {
+  if (maxChars <= 0) return "";
+  if (text.length <= maxChars) return text;
+  if (maxChars <= 1) return "…";
+  return `${text.slice(0, Math.max(0, maxChars - 1))}…`;
+}
+
 function miniIconPath(name: string): string {
   const n = name.toLowerCase();
   if (n.includes("health")) return "M12 4 L20 22 L4 22 Z";
@@ -76,19 +83,35 @@ export function renderBudgetInfographicSvg(data: BudgetInfographicDataset): stri
       if (!r) return "";
       const rx = gx + r.x;
       const ry = gridY + r.y;
+      const clipId = `clip-${idx}`;
       const isHi = Boolean(data.highlightName && item.name === data.highlightName);
       const stroke = isHi ? "#f48945" : "#ffffff";
       const sw = isHi ? 4 : 2;
       const textFill = "#ffffff";
       const icon = miniIconPath(item.name);
+
+      const labelMaxChars = Math.max(8, Math.floor((r.w - 28) / 7.2));
+      const label = truncateToFit(item.name, labelMaxChars);
+      const value = formatBlockAmount(item.amount);
+
+      const labelSize = r.h < 92 ? 12 : r.h < 132 ? 13 : 14;
+      const valueSize = r.h < 92 ? 16 : r.h < 132 ? 18 : 20;
+
       return `
   <g>
+    <clipPath id="${clipId}">
+      <rect x="${rx}" y="${ry}" width="${r.w}" height="${r.h}" rx="6" />
+    </clipPath>
     <rect x="${rx}" y="${ry}" width="${r.w}" height="${r.h}" rx="6" fill="${item.color}" stroke="${stroke}" stroke-width="${sw}"/>
-    <path d="${icon}" fill="${textFill}" fill-opacity="0.35" transform="translate(${rx + 12},${ry + 10}) scale(0.85)"/>
-    <text x="${rx + 14}" y="${ry + 44}" fill="${textFill}" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700">${esc(item.name)}</text>
-    <text x="${rx + 14}" y="${ry + 72}" fill="${textFill}" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="800">${esc(
-      formatBlockAmount(item.amount),
-    )}</text>
+    <g clip-path="url(#${clipId})">
+      <path d="${icon}" fill="${textFill}" fill-opacity="0.35" transform="translate(${rx + 12},${ry + 10}) scale(0.85)"/>
+      <text x="${rx + 14}" y="${ry + 42}" fill="${textFill}" font-family="Arial, Helvetica, sans-serif" font-size="${labelSize}" font-weight="700">${esc(
+        label,
+      )}</text>
+      <text x="${rx + 14}" y="${ry + 70}" fill="${textFill}" font-family="Arial, Helvetica, sans-serif" font-size="${valueSize}" font-weight="800">${esc(
+        value,
+      )}</text>
+    </g>
   </g>`;
     })
     .join("");

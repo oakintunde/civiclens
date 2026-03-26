@@ -26,6 +26,7 @@ export function BudgetInfographicPanel({
   municipalRows,
 }: Props) {
   const [downloading, setDownloading] = React.useState(false);
+  const [animTick, setAnimTick] = React.useState(0);
 
   const dataset = React.useMemo(
     () =>
@@ -50,6 +51,11 @@ export function BudgetInfographicPanel({
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgMarkup)}`;
   }, [svgMarkup]);
 
+  React.useEffect(() => {
+    if (!dataUrl) return;
+    setAnimTick((t) => t + 1);
+  }, [dataUrl]);
+
   const handleDownloadPng = () => {
     if (!svgMarkup) return;
     setDownloading(true);
@@ -65,6 +71,15 @@ export function BudgetInfographicPanel({
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <style>{`
+        @keyframes infographicEnter {
+          0% { opacity: 0; transform: translateY(10px) scale(0.99); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .infographic-enter { animation: infographicEnter 420ms ease-out both; }
+        .infographic-hover { transition: transform 220ms ease, box-shadow 220ms ease; }
+        .infographic-hover:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(2,6,23,0.10); }
+      `}</style>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h2
@@ -101,7 +116,8 @@ export function BudgetInfographicPanel({
         </div>
       ) : (
         <div
-          className="rounded-xl border-2 p-4 md:p-6 bg-white shadow-sm overflow-x-auto"
+          key={animTick}
+          className="rounded-xl border-2 p-4 md:p-6 bg-white shadow-sm overflow-x-auto infographic-hover infographic-enter"
           style={{ borderColor: "#e8eef5" }}
         >
           <img
