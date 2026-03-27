@@ -17,7 +17,7 @@ type FormState = {
 };
 
 const initialState: FormState = {
-  inquiryType: "General Enquiries",
+  inquiryType: "",
   firstName: "",
   lastName: "",
   organizationName: "",
@@ -27,34 +27,102 @@ const initialState: FormState = {
   phoneNumber: "",
 };
 
+const FIELD_LABELS: Record<keyof FormState, string> = {
+  inquiryType: "Inquiry Type",
+  firstName: "First Name",
+  lastName: "Last Name",
+  organizationName: "Organization Name",
+  jobTitle: "Job Title",
+  comments: "Comments",
+  email: "Email",
+  phoneNumber: "Phone Number",
+};
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function digitsOnly(s: string): string {
+  return s.replace(/\D/g, "");
+}
+
+/** Returns null if valid, otherwise a message listing issues. */
+function validateContactForm(form: FormState): string | null {
+  const t = {
+    inquiryType: form.inquiryType.trim(),
+    firstName: form.firstName.trim(),
+    lastName: form.lastName.trim(),
+    organizationName: form.organizationName.trim(),
+    jobTitle: form.jobTitle.trim(),
+    comments: form.comments.trim(),
+    email: form.email.trim(),
+    phoneNumber: form.phoneNumber.trim(),
+  };
+
+  const empty: (keyof FormState)[] = [];
+  (Object.keys(t) as (keyof FormState)[]).forEach((key) => {
+    if (!t[key]) empty.push(key);
+  });
+
+  const extra: string[] = [];
+  if (t.email && !EMAIL_RE.test(t.email)) {
+    extra.push(`${FIELD_LABELS.email} must be a valid address`);
+  }
+  const phoneDigits = digitsOnly(t.phoneNumber);
+  if (t.phoneNumber && phoneDigits.length < 10) {
+    extra.push(`${FIELD_LABELS.phoneNumber} must include at least 10 digits`);
+  }
+
+  if (empty.length > 0) {
+    const names = empty.map((k) => FIELD_LABELS[k]);
+    return `Please fill in: ${names.join(", ")}.`;
+  }
+  if (extra.length > 0) {
+    return extra.join(" ");
+  }
+  return null;
+}
+
 export default function Contact() {
   const [form, setForm] = React.useState<FormState>(initialState);
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [validationMessage, setValidationMessage] = React.useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setValidationMessage(null);
+    if (status === "success") setStatus("idle");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus("submitting");
     setErrorMessage(null);
+    setValidationMessage(null);
+
+    const validationError = validateContactForm(form);
+    if (validationError) {
+      setValidationMessage(validationError);
+      setStatus("idle");
+      return;
+    }
+
+    setStatus("submitting");
+
+    const t = {
+      inquiryType: form.inquiryType.trim(),
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      organizationName: form.organizationName.trim(),
+      jobTitle: form.jobTitle.trim(),
+      comments: form.comments.trim(),
+      email: form.email.trim(),
+      phoneNumber: form.phoneNumber.trim(),
+    };
 
     try {
-      await saveContactSubmission({
-        inquiryType: form.inquiryType.trim(),
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
-        organizationName: form.organizationName.trim(),
-        jobTitle: form.jobTitle.trim(),
-        comments: form.comments.trim(),
-        email: form.email.trim(),
-        phoneNumber: form.phoneNumber.trim(),
-      });
+      await saveContactSubmission(t);
 
       setStatus("success");
       setForm(initialState);
@@ -91,6 +159,7 @@ export default function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <form
             onSubmit={handleSubmit}
+            noValidate
             className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -104,9 +173,10 @@ export default function Contact() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
                 >
-                  <option value="General Enquiries" disabled>
-                    General Enquiries
+                  <option value="" disabled>
+                    Select inquiry type
                   </option>
+                  <option value="General Enquiries">General Enquiries</option>
                   <option value="Data Request">Data Request</option>
                   <option value="Technical Support">Technical Support</option>
                   <option value="Partnership Inquiry">Partnership Inquiry</option>
@@ -122,7 +192,7 @@ export default function Contact() {
                   name="firstName"
                   value={form.firstName}
                   onChange={handleChange}
-                  required
+                  autoComplete="given-name"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
                 />
               </div>
@@ -135,7 +205,7 @@ export default function Contact() {
                   name="lastName"
                   value={form.lastName}
                   onChange={handleChange}
-                  required
+                  autoComplete="family-name"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
                 />
               </div>
@@ -148,7 +218,7 @@ export default function Contact() {
                   name="organizationName"
                   value={form.organizationName}
                   onChange={handleChange}
-                  required
+                  autoComplete="organization"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
                 />
               </div>
@@ -161,7 +231,7 @@ export default function Contact() {
                   name="jobTitle"
                   value={form.jobTitle}
                   onChange={handleChange}
-                  required
+                  autoComplete="organization-title"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
                 />
               </div>
@@ -174,7 +244,6 @@ export default function Contact() {
                   name="comments"
                   value={form.comments}
                   onChange={handleChange}
-                  required
                   rows={5}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca] resize-none"
                 />
@@ -189,7 +258,7 @@ export default function Contact() {
                   type="email"
                   value={form.email}
                   onChange={handleChange}
-                  required
+                  autoComplete="email"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
                 />
               </div>
@@ -200,15 +269,22 @@ export default function Contact() {
                 </label>
                 <input
                   name="phoneNumber"
+                  type="tel"
                   value={form.phoneNumber}
                   onChange={handleChange}
-                  required
+                  autoComplete="tel"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white outline-none focus:ring-2 focus:ring-[#318cca] focus:border-[#318cca]"
                 />
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            {validationMessage ? (
+              <p className="mt-4 text-sm text-red-700 font-medium" role="alert">
+                {validationMessage}
+              </p>
+            ) : null}
+
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
               <button
                 type="submit"
                 disabled={status === "submitting"}
@@ -221,10 +297,14 @@ export default function Contact() {
               </button>
 
               {status === "success" ? (
-                <p className="text-sm text-green-700 font-medium">Thanks! Your message was saved.</p>
+                <p className="text-sm text-[#0B2545] font-medium">
+                  Thank you for reaching out, We will get back to you soon.
+                </p>
               ) : null}
               {status === "error" ? (
-                <p className="text-sm text-red-700 font-medium">{errorMessage ?? "Submission failed"}</p>
+                <p className="text-sm text-red-700 font-medium" role="alert">
+                  {errorMessage ?? "Submission failed"}
+                </p>
               ) : null}
             </div>
           </form>
