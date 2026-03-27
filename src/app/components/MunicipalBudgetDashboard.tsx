@@ -238,7 +238,7 @@ export function MunicipalBudgetDashboard({
               >
                 {selectedRow.city} Spending Distribution
               </h3>
-              <div className="h-[280px] w-full">
+              <div className="h-[240px] sm:h-[280px] w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -355,19 +355,20 @@ export function MunicipalBudgetDashboard({
           <p className="text-xs text-gray-500 mb-2">
             Fiscal year {year ? year : "All Year"} (demo data)
           </p>
-          <div className="h-[280px] w-full">
+          <div className="h-[min(280px,65vh)] sm:h-[280px] w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonBars} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+              <BarChart data={comparisonBars} margin={{ top: 8, right: 8, left: 4, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="city" tick={{ fontSize: 11 }} interval={0} />
+                <XAxis dataKey="city" tick={{ fontSize: 10 }} interval={0} />
                 <YAxis
+                  width={44}
                   domain={[0, 20]}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 10 }}
                   label={{
                     value: "Billions ($)",
                     angle: -90,
                     position: "insideLeft",
-                    style: { fontSize: 11, fill: "#6b7280" },
+                    style: { fontSize: 10, fill: "#6b7280" },
                   }}
                 />
                 <Tooltip
@@ -397,20 +398,21 @@ export function MunicipalBudgetDashboard({
           <p className="text-xs text-gray-500 mb-2">
             Fiscal year {year ? year : "All Year"} (demo data)
           </p>
-          <div className="h-[280px] w-full">
+          <div className="h-[min(280px,65vh)] sm:h-[280px] w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonBars} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+              <BarChart data={comparisonBars} margin={{ top: 8, right: 8, left: 4, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="city" tick={{ fontSize: 11 }} interval={0} />
+                <XAxis dataKey="city" tick={{ fontSize: 10 }} interval={0} />
                 <YAxis
+                  width={48}
                   domain={[0, 6000]}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 10 }}
                   tickFormatter={(v) => `${v}`}
                   label={{
                     value: "Per Capita ($)",
                     angle: -90,
                     position: "insideLeft",
-                    style: { fontSize: 11, fill: "#6b7280" },
+                    style: { fontSize: 10, fill: "#6b7280" },
                   }}
                 />
                 <Tooltip

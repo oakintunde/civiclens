@@ -133,6 +133,8 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-family-primary);
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   /**
@@ -142,6 +144,8 @@
 
   html {
     font-size: var(--font-size);
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {

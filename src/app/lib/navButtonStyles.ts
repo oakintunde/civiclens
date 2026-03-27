@@ -22,3 +22,9 @@ export const navButtonOnDarkOutline = cn(
   navButtonBase,
   "border-2 border-white bg-transparent text-white hover:bg-[#f48945] hover:border-[#f48945] hover:text-white",
 );
+
+/** Solid white primary on dark hero (mobile wireframe: white fill, navy text) */
+export const heroCtaPrimary = cn(
+  navButtonBase,
+  "bg-white text-[#0B2545] border-2 border-white hover:bg-white/95 hover:text-[#0B2545]",
+);

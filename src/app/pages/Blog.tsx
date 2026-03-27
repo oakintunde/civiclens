@@ -1,8 +1,8 @@
 import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, Newspaper } from "lucide-react";
 import * as React from "react";
 import { cn } from "../components/ui/utils";
-import { navButtonPrimary } from "../lib/navButtonStyles";
 import { getBudgetApiBase } from "../lib/budgetApi";
+import { navButtonPrimary } from "../lib/navButtonStyles";
 
 type NewsApiArticle = {
   source?: { name?: string };
@@ -236,14 +236,14 @@ export default function Blog() {
           background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                <Newspaper className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                <Newspaper className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <h1
-                className="text-4xl md:text-5xl font-bold text-white"
+                className="text-[1.65rem] sm:text-4xl md:text-5xl font-bold text-white min-w-0"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
                 Blog
@@ -354,18 +354,21 @@ export default function Blog() {
                   className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
                   aria-label="Blog pagination"
                 >
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 order-2 sm:order-1">
                     Showing page <strong>{page}</strong> of <strong>{totalPages}</strong>
                     {totalResults > 0 ? (
                       <span className="text-gray-500"> ({totalResults.toLocaleString()} total results)</span>
                     ) : null}
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto order-1 sm:order-2">
                     <button
                       type="button"
                       onClick={goPrev}
                       disabled={page <= 1 || loading}
-                      className={cn(navButtonPrimary, "disabled:opacity-40 disabled:cursor-not-allowed")}
+                      className={cn(
+                        navButtonPrimary,
+                        "disabled:opacity-40 disabled:cursor-not-allowed w-full sm:w-auto justify-center min-h-[44px]",
+                      )}
                     >
                       <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden />
                       Previous
@@ -374,7 +377,10 @@ export default function Blog() {
                       type="button"
                       onClick={goNext}
                       disabled={page >= totalPages || loading}
-                      className={cn(navButtonPrimary, "disabled:opacity-40 disabled:cursor-not-allowed")}
+                      className={cn(
+                        navButtonPrimary,
+                        "disabled:opacity-40 disabled:cursor-not-allowed w-full sm:w-auto justify-center min-h-[44px]",
+                      )}
                     >
                       Next
                       <ChevronRight className="w-4 h-4 shrink-0" aria-hidden />

@@ -13,15 +13,18 @@ import { navButtonPrimary } from "../lib/navButtonStyles";
 
 export default function About() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="text-center mb-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="text-center mb-10 sm:mb-12">
         <div className="inline-flex items-center justify-center mb-6">
-          <img src="/logo_civic_lens.png" alt="CivicLens Logo" className="h-20" />
+          <img src="/logo_civic_lens.png" alt="CivicLens Logo" className="h-16 sm:h-20" />
         </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
+        <h1
+          className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4 px-2"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
           About Civic Lens
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        <p className="text-base sm:text-xl text-gray-600 max-w-3xl mx-auto px-2">
           Promoting transparency and accountability in Canadian government spending through accessible, data-driven
           insights.
         </p>

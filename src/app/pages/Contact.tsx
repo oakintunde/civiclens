@@ -72,9 +72,9 @@ export default function Contact() {
           background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <h1
-            className="text-4xl md:text-5xl font-bold text-white"
+            className="text-[1.65rem] sm:text-4xl md:text-5xl font-bold text-white"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
             Contact
@@ -208,21 +208,24 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="mt-6 flex items-center gap-4">
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
               <button
                 type="submit"
                 disabled={status === "submitting"}
-                className={cn(navButtonPrimary, "disabled:opacity-60 disabled:cursor-not-allowed")}
+                className={cn(
+                  navButtonPrimary,
+                  "disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto justify-center min-h-[44px]",
+                )}
               >
                 {status === "submitting" ? "Sending..." : "Send Message"}
               </button>
 
-              {status === "success" && (
+              {status === "success" ? (
                 <p className="text-sm text-green-700 font-medium">Thanks! Your message was saved.</p>
-              )}
-              {status === "error" && (
+              ) : null}
+              {status === "error" ? (
                 <p className="text-sm text-red-700 font-medium">{errorMessage ?? "Submission failed"}</p>
-              )}
+              ) : null}
             </div>
           </form>
 

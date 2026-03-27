@@ -146,7 +146,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
           >
             Budget Distribution
           </h3>
-          <div className="h-[280px] w-full">
+          <div className="h-[220px] sm:h-[280px] w-full min-w-0 max-w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -215,9 +215,9 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
           >
             Spending by Category (Billions)
           </h3>
-          <div className="h-[400px] w-full">
+          <div className="h-[min(400px,70vh)] sm:h-[400px] w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barData} layout="vertical" margin={{ left: 4, right: 12, top: 8, bottom: 8 }}>
+              <BarChart data={barData} layout="vertical" margin={{ left: 0, right: 8, top: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
                 <XAxis
                   type="number"
@@ -227,8 +227,8 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                 <YAxis
                   type="category"
                   dataKey="name"
-                  width={118}
-                  tick={{ fontSize: 10 }}
+                  width={92}
+                  tick={{ fontSize: 9 }}
                   interval={0}
                 />
                 <Tooltip

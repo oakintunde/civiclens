@@ -31,18 +31,27 @@ export function Footer() {
             <h3 className="text-xl mb-4 text-white">Budget Access</h3>
             <ul className="space-y-2 text-sm text-white/80">
               <li>
-                <Link to="/spendings" className="hover:text-white transition-colors text-white/80 hover:text-white">
-                  FG Budget Dashboard
+                <Link
+                  to="/spendings?level=federal"
+                  className="hover:text-white transition-colors text-white/80 hover:text-white"
+                >
+                  Federal budget
                 </Link>
               </li>
               <li>
-                <Link to="/maps" className="hover:text-white transition-colors text-white/80 hover:text-white">
-                  Provincial Data
+                <Link
+                  to="/spendings?level=province"
+                  className="hover:text-white transition-colors text-white/80 hover:text-white"
+                >
+                  Provincial budgets
                 </Link>
               </li>
               <li>
-                <Link to="/infographics" className="hover:text-white transition-colors text-white/80 hover:text-white">
-                  GovSpend
+                <Link
+                  to="/spendings?level=municipal"
+                  className="hover:text-white transition-colors text-white/80 hover:text-white"
+                >
+                  Municipal budgets
                 </Link>
               </li>
             </ul>
@@ -53,17 +62,17 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-white/80">
               <li>
                 <Link to="/comparison" className="hover:text-white transition-colors text-white/80 hover:text-white">
-                  Tables
+                  Year-over-year trends
                 </Link>
               </li>
               <li>
-                <Link to="/infographics" className="hover:text-white transition-colors text-white/80 hover:text-white">
-                  Infographics
+                <Link to="/blog" className="hover:text-white transition-colors text-white/80 hover:text-white">
+                  Blog
                 </Link>
               </li>
               <li>
-                <Link to="/maps" className="hover:text-white transition-colors text-white/80 hover:text-white">
-                  Maps
+                <Link to="/about-us" className="hover:text-white transition-colors text-white/80 hover:text-white">
+                  About us
                 </Link>
               </li>
             </ul>

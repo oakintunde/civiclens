@@ -12,7 +12,7 @@ import * as React from "react";
 import { Link } from "react-router";
 import { cn } from "../components/ui/utils";
 import { federalBudget2025 } from "../data/budgetData";
-import { navButtonOnDarkOutline, navButtonPrimary } from "../lib/navButtonStyles";
+import { heroCtaPrimary, navButtonOnDarkOutline, navButtonPrimary } from "../lib/navButtonStyles";
 import { getBudgetApiBase } from "../lib/budgetApi";
 
 export function Home() {
@@ -53,12 +53,15 @@ export function Home() {
         body: JSON.stringify({ name: subscriberName, email: subscriberEmail }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as
-        | { ok?: boolean; alreadySubscribed?: boolean; message?: string; error?: string }
-        | { error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        alreadySubscribed?: boolean;
+        message?: string;
+        error?: string;
+      };
 
       if (!res.ok) {
-        setErrorMessage((data as { error?: string }).error ?? "Subscription failed.");
+        setErrorMessage(data.error ?? "Subscription failed.");
         return;
       }
 
@@ -83,24 +86,33 @@ export function Home() {
           background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
           <div className="max-w-3xl">
             <h1
-              className="text-4xl md:text-5xl font-bold mb-6"
+              className="text-[1.75rem] leading-tight sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               Understanding Canada&apos;s Public Spending
             </h1>
-            <p className="text-xl md:text-2xl mb-8" style={{ color: "#c3d4e6" }}>
-              Explore transparent, accessible data on how your tax dollars are spent at federal, provincial,
-              and municipal levels.
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-10 leading-relaxed" style={{ color: "#c3d4e6" }}>
+              <span className="md:hidden">Explore transparent data on how your tax dollars are spent.</span>
+              <span className="hidden md:inline">
+                Explore transparent, accessible data on how your tax dollars are spent at federal, provincial, and
+                municipal levels.
+              </span>
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Link to="/spendings?level=federal" className={cn(navButtonPrimary, "gap-2")}>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 w-full sm:w-auto">
+              <Link
+                to="/spendings?level=federal"
+                className={cn(heroCtaPrimary, "gap-2 w-full justify-center sm:w-auto min-h-[44px]")}
+              >
                 Explore Federal Budget
                 <ArrowRight className="w-4 h-4 shrink-0" aria-hidden />
               </Link>
-              <Link to="/spendings?level=province" className={navButtonOnDarkOutline}>
+              <Link
+                to="/spendings?level=province"
+                className={cn(navButtonOnDarkOutline, "w-full justify-center sm:w-auto min-h-[44px]")}
+              >
                 View Provincial Budgets
               </Link>
             </div>
@@ -108,54 +120,54 @@ export function Home() {
         </div>
       </section>
 
-      {/* Quick Stats */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-lg p-6 border-2" style={{ borderColor: "#e8eef5" }}>
+      {/* Quick Stats — overlap hero; single column mobile, 2-col tablet, 3-col desktop */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 md:-mt-12 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-5 sm:p-6 border-2" style={{ borderColor: "#e8eef5" }}>
             <div className="flex items-center gap-4">
               <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
+                className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
                 style={{ backgroundColor: "#e8eef5" }}
               >
                 <DollarSign className="w-6 h-6" style={{ color: "#0B2545" }} />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm text-gray-600">2025 Federal Budget</p>
-                <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
                   {formattedTotal}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 border-2" style={{ borderColor: "#e8eef5" }}>
+          <div className="bg-white rounded-xl shadow-lg p-5 sm:p-6 border-2" style={{ borderColor: "#e8eef5" }}>
             <div className="flex items-center gap-4">
               <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
+                className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
                 style={{ backgroundColor: "#e8eef5" }}
               >
                 <Users className="w-6 h-6" style={{ color: "#0B2545" }} />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm text-gray-600">Per Capita Spending</p>
-                <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
                   $12,340
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 border-2" style={{ borderColor: "#e8eef5" }}>
+          <div className="bg-white rounded-xl shadow-lg p-5 sm:p-6 border-2 sm:col-span-2 lg:col-span-1" style={{ borderColor: "#e8eef5" }}>
             <div className="flex items-center gap-4">
               <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
+                className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
                 style={{ backgroundColor: "#e8eef5" }}
               >
                 <PieChart className="w-6 h-6" style={{ color: "#0B2545" }} />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm text-gray-600">Budget Categories</p>
-                <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
                   12
                 </p>
               </div>
@@ -165,16 +177,16 @@ export function Home() {
       </section>
 
       {/* Main Navigation Cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8" style={{ fontFamily: "Montserrat, sans-serif" }}>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8" style={{ fontFamily: "Montserrat, sans-serif" }}>
           Explore Budget Data
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {/* Federal Budget Card */}
           <Link
             to="/spendings?level=federal"
-            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-8 border-2 border-gray-100"
+            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-6 sm:p-8 border-2 border-gray-100"
             style={{
               borderColor: "#e5e7eb",
             }}
@@ -226,7 +238,7 @@ export function Home() {
           {/* Provincial Budgets Card */}
           <Link
             to="/spendings?level=province"
-            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-8 border-2 border-gray-100"
+            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-6 sm:p-8 border-2 border-gray-100"
             style={{ borderColor: "#e5e7eb" }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = "#0B2545";
@@ -266,7 +278,7 @@ export function Home() {
           {/* Municipal Budgets Card */}
           <Link
             to="/spendings?level=municipal"
-            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-8 border-2 border-gray-100"
+            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-6 sm:p-8 border-2 border-gray-100"
             style={{ borderColor: "#e5e7eb" }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = "#0B2545";
@@ -305,7 +317,7 @@ export function Home() {
           {/* Year Comparison Card */}
           <Link
             to="/comparison"
-            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-8 border-2 border-gray-100"
+            className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all p-6 sm:p-8 border-2 border-gray-100"
             style={{ borderColor: "#e5e7eb" }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = "#0B2545";
@@ -403,16 +415,19 @@ export function Home() {
       </section>
 
       {/* Subscribe Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gray-50 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div
-            className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border-2 p-8 md:p-12"
+            className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border-2 p-6 sm:p-8 md:p-12"
             style={{ borderColor: "#e8eef5" }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
               {/* Left Side - Text */}
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                <h2
+                  className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4"
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                >
                   Subscribe to get updates
                 </h2>
                 <p className="text-gray-600">

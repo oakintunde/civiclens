@@ -171,7 +171,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
               <p className="text-xs text-gray-500 mb-2">
                 Fiscal year {yearNumber == null ? "All Year" : yearNumber} (demo data)
               </p>
-              <div className="h-[280px] w-full">
+              <div className="h-[240px] sm:h-[280px] w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -321,21 +321,22 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
           >
             Per Capita Spending Comparison
           </h3>
-          <div className="h-[320px] w-full">
+          <div className="h-[min(320px,70vh)] sm:h-[320px] w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonRows} margin={{ top: 8, right: 8, left: 8, bottom: 48 }}>
+              <BarChart data={comparisonRows} margin={{ top: 8, right: 8, left: 4, bottom: 48 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 10 }}
+                  tick={{ fontSize: 9 }}
                   angle={-25}
                   textAnchor="end"
                   height={60}
                   interval={0}
                 />
                 <YAxis
+                  width={52}
                   label={{ value: "Per Capita ($)", angle: -90, position: "insideLeft" }}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 10 }}
                   tickFormatter={(v) => v.toLocaleString("en-CA")}
                 />
                 <Tooltip

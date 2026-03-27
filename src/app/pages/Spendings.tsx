@@ -49,16 +49,16 @@ export default function Spendings() {
           background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-            <div className="max-w-3xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8">
+            <div className="max-w-3xl min-w-0">
               <h1
-                className="text-4xl md:text-5xl font-bold text-white mb-2"
+                className="text-[1.65rem] leading-tight sm:text-4xl md:text-5xl font-bold text-white mb-2"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
                 {title}
               </h1>
-              <p className="text-base md:text-lg text-white/90">{subtitle}</p>
+              <p className="text-sm sm:text-base md:text-lg text-white/90">{subtitle}</p>
             </div>
             <SharePageSocialRow
               pageUrl={sharePageUrl}
