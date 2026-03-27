@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { BudgetPieTooltip } from "./BudgetPieTooltip";
 import { cn } from "../components/ui/utils";
 import {
   formatBillions,
@@ -177,13 +178,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                     );
                   })}
                 </Pie>
-                <Tooltip
-                  formatter={(value) => {
-                    const n = typeof value === "number" ? value : Number(value);
-                    return [formatBillions(Number.isFinite(n) ? n : 0), "Amount"];
-                  }}
-                  labelFormatter={(name) => String(name)}
-                />
+                <Tooltip content={BudgetPieTooltip} />
               </PieChart>
             </ResponsiveContainer>
           </div>

@@ -18,6 +18,7 @@ import {
   MUNICIPAL_CHART_CITY_ORDER,
   type MunicipalBudgetRow,
 } from "../data/budgetData";
+import { BudgetPieTooltip } from "./BudgetPieTooltip";
 import { cn } from "./ui/utils";
 
 const BAR_FILL = "#0B2545";
@@ -267,13 +268,7 @@ export function MunicipalBudgetDashboard({
                         );
                       })}
                     </Pie>
-                    <Tooltip
-                      formatter={(value) => {
-                        const n = typeof value === "number" ? value : Number(value);
-                        return [formatBillions(Number.isFinite(n) ? n : 0), "Amount"];
-                      }}
-                      labelFormatter={(name) => String(name)}
-                    />
+                    <Tooltip content={BudgetPieTooltip} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
