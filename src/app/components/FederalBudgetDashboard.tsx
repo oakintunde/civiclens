@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { BudgetPieTooltip } from "./BudgetPieTooltip";
+import { PieActiveShape } from "./PieActiveShape";
 import { cn } from "../components/ui/utils";
 import {
   formatBillions,
@@ -159,6 +160,9 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
                   innerRadius={48}
                   outerRadius={100}
                   paddingAngle={1}
+                  activeShape={PieActiveShape}
+                  animationDuration={280}
+                  animationEasing="ease-out"
                   label={(props: { percent?: number }) =>
                     props.percent != null ? `${(props.percent * 100).toFixed(1)}%` : ""
                   }

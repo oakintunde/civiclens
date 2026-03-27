@@ -19,6 +19,7 @@ import {
   type MunicipalBudgetRow,
 } from "../data/budgetData";
 import { BudgetPieTooltip } from "./BudgetPieTooltip";
+import { PieActiveShape } from "./PieActiveShape";
 import { cn } from "./ui/utils";
 
 const BAR_FILL = "#0B2545";
@@ -251,6 +252,9 @@ export function MunicipalBudgetDashboard({
                       innerRadius={48}
                       outerRadius={100}
                       paddingAngle={1}
+                      activeShape={PieActiveShape}
+                      animationDuration={280}
+                      animationEasing="ease-out"
                       label={(props: { percent?: number }) =>
                         props.percent != null ? `${(props.percent * 100).toFixed(0)}%` : ""
                       }
