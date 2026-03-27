@@ -1,6 +1,6 @@
+import { MapPin } from "lucide-react";
 import * as React from "react";
 
-import contactIllustration from "../../assets/contact_image.png";
 import { saveContactSubmission } from "../lib/contactDb";
 import { navButtonPrimary } from "../lib/navButtonStyles";
 import { cn } from "../components/ui/utils";
@@ -86,7 +86,7 @@ export default function Contact() {
         </div>
       </div>
 
-      {/* Form */}
+      {/* Form + contact details */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <form
@@ -229,13 +229,43 @@ export default function Contact() {
             </div>
           </form>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8 min-h-[360px] flex items-center justify-center">
-            <img
-              src={contactIllustration}
-              alt="Contact illustration"
-              className="w-full h-full object-contain max-h-[300px]"
-            />
-          </div>
+          <aside
+            className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8"
+            style={{ borderColor: "#e8eef5" }}
+          >
+            <h2
+              className="text-xl font-bold text-gray-900 mb-4"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+            >
+              Contact us
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              Contact us via email{" "}
+              <a href="mailto:info@civiclens.ca" className="font-semibold text-[#0B2545] hover:underline">
+                info@civiclens.ca
+              </a>{" "}
+              or telephone{" "}
+              <a href="tel:+17785859415" className="font-semibold text-[#0B2545] hover:underline whitespace-nowrap">
+                778-585-9415
+              </a>
+              .
+            </p>
+            <div className="flex gap-3 text-gray-700">
+              <MapPin className="w-5 h-5 shrink-0 text-[#0B2545] mt-0.5" aria-hidden />
+              <div>
+                <p className="text-sm font-semibold text-gray-900 mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                  Address
+                </p>
+                <address className="not-italic text-sm leading-relaxed">
+                  DGL Department, North Island College
+                  <br />
+                  2300 Ryan Rd
+                  <br />
+                  Courtenay, BC V9N 8N6
+                </address>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
