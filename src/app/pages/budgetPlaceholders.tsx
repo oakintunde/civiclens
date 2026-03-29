@@ -1,7 +1,11 @@
 import { TrendingUp } from "lucide-react";
+import { YearComparisonFiltersCard } from "../components/YearComparisonFiltersCard";
+import { useYearComparisonFiltersState } from "../hooks/useYearComparisonFiltersState";
 
 /** Linked from Home and footer; full comparison UI not built yet. */
 export function YearComparison() {
+  const filters = useYearComparisonFiltersState();
+
   return (
     <div style={{ fontFamily: "Poppins, sans-serif" }}>
       <div
@@ -29,8 +33,13 @@ export function YearComparison() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-        <p className="text-gray-600 max-w-3xl">This section is coming soon.</p>
+      <YearComparisonFiltersCard {...filters} />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+        <p className="text-gray-600 max-w-3xl">
+          Comparison charts for <strong>{filters.yearA}</strong> vs <strong>{filters.yearB}</strong> are coming
+          soon.
+        </p>
       </div>
     </div>
   );
