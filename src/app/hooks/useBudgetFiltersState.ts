@@ -46,7 +46,7 @@ function fallbackYearsForLevel(level: BudgetLevel): string[] {
 }
 
 export type UseBudgetFiltersStateOptions = {
-  /** When true, read `?level=` from URL (Spendings). Infographics should use false. */
+  /** When true, read `?level=` from URL (Spendings page). */
   syncUrlLevel?: boolean;
 };
 
