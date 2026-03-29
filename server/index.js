@@ -3,7 +3,9 @@ import express from "express";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { Client } from "@sendgrid/client";
 import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MUNICIPAL_BUDGETS_BASE = JSON.parse(
@@ -60,6 +62,14 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function createTransporter() {
   const host = process.env.SMTP_HOST;
   if (!host) return null;
@@ -80,13 +90,48 @@ function createTransporter() {
   });
 }
 
-async function sendSubscriptionEmail({ name, email }) {
-  const transporter = createTransporter();
-  if (!transporter) {
-    // No SMTP config in env; still treat subscription as successful.
-    console.log("[subscribe] SMTP not configured; skipping email send.");
-    return false;
+/**
+ * SendGrid (preferred when SENDGRID_API_KEY is set).
+ * Optional: SENDGRID_DATA_RESIDENCY=eu for EU-pinned subusers.
+ * Optional: SENDGRID_FROM_EMAIL (must be a verified sender in SendGrid).
+ */
+async function sendSubscriptionEmailSendGrid({ name, email }) {
+  const apiKey = process.env.SENDGRID_API_KEY?.trim();
+  if (!apiKey) return false;
+
+  // EU residency must be set on the client before setApiKey so the correct API host is used.
+  const client = new Client();
+  const residency = String(process.env.SENDGRID_DATA_RESIDENCY ?? "").toLowerCase();
+  if (residency === "eu") {
+    client.setDataResidency("eu");
   }
+  client.setApiKey(apiKey);
+  sgMail.setClient(client);
+
+  const from =
+    process.env.SENDGRID_FROM_EMAIL?.trim() || "do-not-reply@thecivic-lens.netlify.app";
+  const safeName = String(name ?? "").trim() || "there";
+  const subject = "Your subscription is confirmed";
+  const text = `Dear ${safeName},
+
+This email confirms your subscription to receive latest updates on the Civic Lens website.
+
+— CivicLens`;
+  const html = `<p>Dear ${escapeHtml(safeName)},</p><p>This email confirms your subscription <strong>to receive latest updates on the Civic Lens website.</strong></p><p>— CivicLens</p>`;
+
+  await sgMail.send({
+    to: email,
+    from,
+    subject,
+    text,
+    html,
+  });
+  return true;
+}
+
+async function sendSubscriptionEmailSmtp({ name, email }) {
+  const transporter = createTransporter();
+  if (!transporter) return false;
 
   const from = process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "no-reply@civiclens.ca";
   const subject = "Subscription confirmed — CivicLens";
@@ -99,6 +144,27 @@ async function sendSubscriptionEmail({ name, email }) {
     subject,
     text,
   });
+  return true;
+}
+
+async function sendSubscriptionEmail({ name, email }) {
+  if (process.env.SENDGRID_API_KEY?.trim()) {
+    try {
+      await sendSubscriptionEmailSendGrid({ name, email });
+      return true;
+    } catch (err) {
+      console.error("[subscribe] SendGrid send failed:", err);
+      throw err;
+    }
+  }
+
+  const transporter = createTransporter();
+  if (!transporter) {
+    console.log("[subscribe] No SENDGRID_API_KEY or SMTP; skipping email send.");
+    return false;
+  }
+
+  await sendSubscriptionEmailSmtp({ name, email });
   return true;
 }
 
