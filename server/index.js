@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { Client } from "@sendgrid/client";
@@ -34,7 +34,9 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
-const SUBSCRIBERS_FILE = join(__dirname, "subscribers.json");
+/** Writable path; on some hosts `server/` is read-only — set e.g. `/tmp/civiclens-subscribers.json`. */
+const SUBSCRIBERS_FILE =
+  process.env.SUBSCRIBERS_FILE?.trim() || join(__dirname, "subscribers.json");
 
 function loadSubscribers() {
   if (!existsSync(SUBSCRIBERS_FILE)) return { subscribers: [] };
@@ -49,6 +51,10 @@ function loadSubscribers() {
 }
 
 function saveSubscribers(data) {
+  const dir = dirname(SUBSCRIBERS_FILE);
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
   writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(data, null, 2), "utf8");
 }
 
@@ -154,7 +160,7 @@ async function sendSubscriptionEmail({ name, email }) {
       return true;
     } catch (err) {
       console.error("[subscribe] SendGrid send failed:", err);
-      throw err;
+      return false;
     }
   }
 
@@ -164,8 +170,13 @@ async function sendSubscriptionEmail({ name, email }) {
     return false;
   }
 
-  await sendSubscriptionEmailSmtp({ name, email });
-  return true;
+  try {
+    await sendSubscriptionEmailSmtp({ name, email });
+    return true;
+  } catch (err) {
+    console.error("[subscribe] SMTP send failed:", err);
+    return false;
+  }
 }
 
 // NewsAPI key (also override with NEWS_API_KEY env in production)
@@ -281,9 +292,18 @@ app.post("/api/subscribe", async (req, res) => {
       email: normalizedEmail,
       createdAt: new Date().toISOString(),
     });
-    saveSubscribers(data);
 
-    // Best-effort email confirmation (does not block subscription storage).
+    try {
+      saveSubscribers(data);
+    } catch (saveErr) {
+      console.error("[subscribe] Failed to save subscribers file:", SUBSCRIBERS_FILE, saveErr);
+      return res.status(503).json({
+        error:
+          "Could not save your subscription (server storage error). If you deploy the API, set the SUBSCRIBERS_FILE environment variable to a writable path (for example /tmp/civiclens-subscribers.json).",
+      });
+    }
+
+    // Best-effort email confirmation (never fails the HTTP response).
     try {
       await sendSubscriptionEmail({ name: normalizedName, email: normalizedEmail });
     } catch (err) {
@@ -296,7 +316,11 @@ app.post("/api/subscribe", async (req, res) => {
       message: "Thank you for subscribing! Please check your email.",
     });
   } catch (err) {
-    return res.status(500).json({ error: "Subscription failed." });
+    console.error("[subscribe] Unexpected error:", err);
+    return res.status(500).json({
+      error: "Subscription failed.",
+      detail: process.env.NODE_ENV !== "production" ? String(err?.message ?? err) : undefined,
+    });
   }
 });
 

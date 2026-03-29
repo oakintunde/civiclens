@@ -151,15 +151,29 @@ export default function Blog() {
         body: JSON.stringify({ name: subscriberName, email: subscriberEmail }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as {
+      const raw = await res.text();
+      let data: {
         ok?: boolean;
         alreadySubscribed?: boolean;
         message?: string;
         error?: string;
-      };
+        detail?: string;
+      } = {};
+      try {
+        if (raw) data = JSON.parse(raw) as typeof data;
+      } catch {
+        /* non-JSON */
+      }
 
       if (!res.ok) {
-        setSubscribeErrorMessage(data.error ?? "Subscription failed.");
+        const parts = [
+          data.error,
+          import.meta.env.DEV && data.detail ? data.detail : null,
+          res.status === 404
+            ? "Subscription API not found. Run npm run dev:server or set VITE_API_URL to your API."
+            : null,
+        ].filter(Boolean);
+        setSubscribeErrorMessage(parts.length > 0 ? parts.join(" ") : "Subscription failed.");
         return;
       }
 
