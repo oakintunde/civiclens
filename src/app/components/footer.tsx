@@ -20,9 +20,14 @@ export function Footer() {
                 <p className="text-white/80 text-sm mb-4">
                   Support good work by donating to our mission to improve quality of work we deliver.
                 </p>
-                <button type="button" className={navButtonOnDarkOutline}>
+                <a
+                  href="https://square.link/u/mGc4fJlM"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={navButtonOnDarkOutline}
+                >
                   Donate Now
-                </button>
+                </a>
               </div>
             </div>
           </div>
