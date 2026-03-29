@@ -1,4 +1,5 @@
 import { TrendingUp } from "lucide-react";
+import { YearComparisonDashboard } from "../components/YearComparisonDashboard";
 import { YearComparisonFiltersCard } from "../components/YearComparisonFiltersCard";
 import { useYearComparisonFiltersState } from "../hooks/useYearComparisonFiltersState";
 
@@ -29,18 +30,22 @@ export function YearComparison() {
             <p className="mt-1 text-base md:text-lg text-white/90 max-w-3xl">
               Track budget changes over time and understand spending trends from 2020 to 2025.
             </p>
+            <p className="mt-4 text-sm sm:text-base text-white/85 max-w-3xl leading-relaxed">
+              Choose a government level and two fiscal years to compare (for example, 2025 vs 2024).
+            </p>
           </div>
         </div>
       </div>
 
       <YearComparisonFiltersCard {...filters} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
-        <p className="text-gray-600 max-w-3xl">
-          Comparison charts for <strong>{filters.yearA}</strong> vs <strong>{filters.yearB}</strong> are coming
-          soon.
-        </p>
-      </div>
+      <YearComparisonDashboard
+        level={filters.level}
+        yearA={filters.yearA}
+        yearB={filters.yearB}
+        province={filters.province}
+        municipalSelection={filters.municipalSelection}
+      />
     </div>
   );
 }

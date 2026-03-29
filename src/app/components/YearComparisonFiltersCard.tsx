@@ -1,8 +1,8 @@
 import { BarChart3 } from "lucide-react";
+import { PROVINCE_OPTIONS } from "../hooks/useBudgetFiltersState";
+import type { YearComparisonFiltersState } from "../hooks/useYearComparisonFiltersState";
 import { BUDGET_LEVEL_OPTIONS, type BudgetLevel } from "../lib/budgetApi";
 import { navButtonBase } from "../lib/navButtonStyles";
-import type { YearComparisonFiltersState } from "../hooks/useYearComparisonFiltersState";
-import { PROVINCE_OPTIONS } from "../hooks/useBudgetFiltersState";
 import { cn } from "./ui/utils";
 
 type Props = YearComparisonFiltersState;
@@ -42,10 +42,6 @@ export function YearComparisonFiltersCard({
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white rounded-xl border-2 p-5 md:p-6" style={{ borderColor: "#e8eef5" }}>
-        <p className="text-sm text-gray-600 mb-4">
-          Choose a government level and two fiscal years to compare (for example, 2025 vs 2024).
-        </p>
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <div className="lg:col-span-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">Government Level</label>

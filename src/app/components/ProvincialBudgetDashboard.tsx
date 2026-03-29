@@ -11,9 +11,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { BudgetPieTooltip } from "./BudgetPieTooltip";
-import { PieActiveShape } from "./PieActiveShape";
-import { cn } from "./ui/utils";
 import {
   formatBillions,
   getHighestSpendCategory,
@@ -22,6 +19,9 @@ import {
   PROVINCIAL_DATA_YEARS,
   provincialBudgets2025,
 } from "../data/budgetData";
+import { BudgetPieTooltip } from "./BudgetPieTooltip";
+import { PieActiveShape } from "./PieActiveShape";
+import { cn } from "./ui/utils";
 
 const ALL_PROVINCES = "All Provinces";
 
@@ -97,7 +97,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
           style={{ borderColor: "#fcd34d", backgroundColor: "#fffbeb" }}
           role="status"
         >
-          No detailed spending breakdown is available for this province in the demo dataset. Comparison charts and
+          No detailed spending breakdown is available for this province in the dataset. Comparison charts and
           the overview table still reflect provinces with data.
         </div>
       ) : null}
@@ -171,7 +171,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
                 {scaledRow.province} Spending Distribution
               </h3>
               <p className="text-xs text-gray-500 mb-2">
-                Fiscal year {yearNumber == null ? "All Year" : yearNumber} (demo data)
+                Fiscal year {yearNumber == null ? "All Year" : yearNumber}
               </p>
               <div className="h-[240px] sm:h-[280px] w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
