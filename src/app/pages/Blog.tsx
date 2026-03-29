@@ -151,12 +151,15 @@ export default function Blog() {
         body: JSON.stringify({ name: subscriberName, email: subscriberEmail }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as
-        | { alreadySubscribed?: boolean; message?: string; error?: string }
-        | { error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        alreadySubscribed?: boolean;
+        message?: string;
+        error?: string;
+      };
 
       if (!res.ok) {
-        setSubscribeErrorMessage((data as { error?: string }).error ?? "Subscription failed.");
+        setSubscribeErrorMessage(data.error ?? "Subscription failed.");
         return;
       }
 
