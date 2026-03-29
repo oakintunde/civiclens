@@ -1,11 +1,8 @@
 import cors from "cors";
 import express from "express";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import { Client } from "@sendgrid/client";
-import nodemailer from "nodemailer";
-import sgMail from "@sendgrid/mail";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MUNICIPAL_BUDGETS_BASE = JSON.parse(
@@ -32,152 +29,6 @@ function scaleMunicipalBudgets(year, baseRows) {
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "1mb" }));
-
-/** Writable path; on some hosts `server/` is read-only — set e.g. `/tmp/civiclens-subscribers.json`. */
-const SUBSCRIBERS_FILE =
-  process.env.SUBSCRIBERS_FILE?.trim() || join(__dirname, "subscribers.json");
-
-function loadSubscribers() {
-  if (!existsSync(SUBSCRIBERS_FILE)) return { subscribers: [] };
-  try {
-    const raw = readFileSync(SUBSCRIBERS_FILE, "utf8");
-    const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.subscribers)) return { subscribers: [] };
-    return parsed;
-  } catch {
-    return { subscribers: [] };
-  }
-}
-
-function saveSubscribers(data) {
-  const dir = dirname(SUBSCRIBERS_FILE);
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
-  }
-  writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(data, null, 2), "utf8");
-}
-
-function normalizeEmail(email) {
-  return String(email ?? "").trim().toLowerCase();
-}
-
-function isValidEmail(email) {
-  const e = normalizeEmail(email);
-  // Simple pragmatic validation for UI submissions.
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function createTransporter() {
-  const host = process.env.SMTP_HOST;
-  if (!host) return null;
-
-  const port = parseInt(String(process.env.SMTP_PORT ?? "587"), 10) || 587;
-  const secure = port === 465;
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: process.env.SMTP_USER
-      ? {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS ?? "",
-        }
-      : undefined,
-  });
-}
-
-/**
- * SendGrid (preferred when SENDGRID_API_KEY is set).
- * Optional: SENDGRID_DATA_RESIDENCY=eu for EU-pinned subusers.
- * Optional: SENDGRID_FROM_EMAIL (must be a verified sender in SendGrid).
- */
-async function sendSubscriptionEmailSendGrid({ name, email }) {
-  const apiKey = process.env.SENDGRID_API_KEY?.trim();
-  if (!apiKey) return false;
-
-  // EU residency must be set on the client before setApiKey so the correct API host is used.
-  const client = new Client();
-  const residency = String(process.env.SENDGRID_DATA_RESIDENCY ?? "").toLowerCase();
-  if (residency === "eu") {
-    client.setDataResidency("eu");
-  }
-  client.setApiKey(apiKey);
-  sgMail.setClient(client);
-
-  const from =
-    process.env.SENDGRID_FROM_EMAIL?.trim() || "do-not-reply@thecivic-lens.netlify.app";
-  const safeName = String(name ?? "").trim() || "there";
-  const subject = "Your subscription is confirmed";
-  const text = `Dear ${safeName},
-
-This email confirms your subscription to receive latest updates on the Civic Lens website.
-
-— CivicLens`;
-  const html = `<p>Dear ${escapeHtml(safeName)},</p><p>This email confirms your subscription <strong>to receive latest updates on the Civic Lens website.</strong></p><p>— CivicLens</p>`;
-
-  await sgMail.send({
-    to: email,
-    from,
-    subject,
-    text,
-    html,
-  });
-  return true;
-}
-
-async function sendSubscriptionEmailSmtp({ name, email }) {
-  const transporter = createTransporter();
-  if (!transporter) return false;
-
-  const from = process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "no-reply@civiclens.ca";
-  const subject = "Subscription confirmed — CivicLens";
-  const safeName = String(name ?? "").trim() || "there";
-  const text = `Hi ${safeName},\n\nThanks for subscribing to CivicLens updates!\n\nYou can reply to this email if you have questions.\n\n— CivicLens`;
-
-  await transporter.sendMail({
-    from,
-    to: email,
-    subject,
-    text,
-  });
-  return true;
-}
-
-async function sendSubscriptionEmail({ name, email }) {
-  if (process.env.SENDGRID_API_KEY?.trim()) {
-    try {
-      await sendSubscriptionEmailSendGrid({ name, email });
-      return true;
-    } catch (err) {
-      console.error("[subscribe] SendGrid send failed:", err);
-      return false;
-    }
-  }
-
-  const transporter = createTransporter();
-  if (!transporter) {
-    console.log("[subscribe] No SENDGRID_API_KEY or SMTP; skipping email send.");
-    return false;
-  }
-
-  try {
-    await sendSubscriptionEmailSmtp({ name, email });
-    return true;
-  } catch (err) {
-    console.error("[subscribe] SMTP send failed:", err);
-    return false;
-  }
-}
 
 // NewsAPI key (also override with NEWS_API_KEY env in production)
 const NEWS_API_KEY =
@@ -264,66 +115,6 @@ app.get("/api/municipal-budgets", (req, res) => {
   res.json({ year, cities });
 });
 
-app.post("/api/subscribe", async (req, res) => {
-  try {
-    const { name, email } = req.body ?? {};
-    const normalizedEmail = normalizeEmail(email);
-    const normalizedName = String(name ?? "").trim();
-
-    if (!normalizedName || normalizedName.length < 2) {
-      return res.status(400).json({ error: "Please enter your name." });
-    }
-    if (!isValidEmail(normalizedEmail)) {
-      return res.status(400).json({ error: "Please enter a valid email address." });
-    }
-
-    const data = loadSubscribers();
-    const existing = data.subscribers.find((s) => normalizeEmail(s.email) === normalizedEmail);
-    if (existing) {
-      return res.json({
-        ok: true,
-        alreadySubscribed: true,
-        message: "Thank you, we already have your email address*.",
-      });
-    }
-
-    data.subscribers.push({
-      name: normalizedName,
-      email: normalizedEmail,
-      createdAt: new Date().toISOString(),
-    });
-
-    try {
-      saveSubscribers(data);
-    } catch (saveErr) {
-      console.error("[subscribe] Failed to save subscribers file:", SUBSCRIBERS_FILE, saveErr);
-      return res.status(503).json({
-        error:
-          "Could not save your subscription (server storage error). If you deploy the API, set the SUBSCRIBERS_FILE environment variable to a writable path (for example /tmp/civiclens-subscribers.json).",
-      });
-    }
-
-    // Best-effort email confirmation (never fails the HTTP response).
-    try {
-      await sendSubscriptionEmail({ name: normalizedName, email: normalizedEmail });
-    } catch (err) {
-      console.error("[subscribe] Failed to send email:", err);
-    }
-
-    return res.json({
-      ok: true,
-      alreadySubscribed: false,
-      message: "Thank you for subscribing! Please check your email.",
-    });
-  } catch (err) {
-    console.error("[subscribe] Unexpected error:", err);
-    return res.status(500).json({
-      error: "Subscription failed.",
-      detail: process.env.NODE_ENV !== "production" ? String(err?.message ?? err) : undefined,
-    });
-  }
-});
-
 app.get("/api/news", async (req, res) => {
   try {
     const page = Math.max(1, parseInt(String(req.query.page ?? "1"), 10) || 1);
@@ -343,6 +134,17 @@ app.get("/api/news", async (req, res) => {
     }
 
     let data = await response.json();
+
+    if (data?.status === "error") {
+      console.error("[news] NewsAPI error:", data.code, data.message);
+      return res.status(502).json({
+        error: data.message || "News provider returned an error",
+        articles: [],
+        totalResults: 0,
+        page,
+        pageSize: PAGE_SIZE,
+      });
+    }
 
     // If the domain filter is too strict and returns no results,
     // retry without domains so the blog page isn't empty.

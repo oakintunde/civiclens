@@ -12,7 +12,7 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      // Same-origin /api in dev → Express on 3001 (subscribe, news, budgets).
+      // Same-origin /api in dev → Express on 3001 (news, budgets).
       "/api": {
         target: "http://localhost:3001",
         changeOrigin: true,

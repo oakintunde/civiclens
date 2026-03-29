@@ -1,7 +1,7 @@
 import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, Newspaper } from "lucide-react";
 import * as React from "react";
 import { cn } from "../components/ui/utils";
-import { getBudgetApiBase } from "../lib/budgetApi";
+import { getNewsApiUrl } from "../lib/budgetApi";
 import { navButtonPrimary } from "../lib/navButtonStyles";
 
 type NewsApiArticle = {
@@ -29,19 +29,6 @@ type BlogPost = {
   externalUrl?: string;
   content: Array<{ heading?: string; body: string }>;
 };
-
-/** Keep only headlines that clearly mention “budget” (client-side clean). */
-function filterBudgetArticles(articles: NewsApiArticle[]): NewsApiArticle[] {
-  const filtered = articles.filter((article) => {
-    const title = (article.title ?? "").toLowerCase();
-    const desc = (article.description ?? "").toLowerCase();
-    return title.includes("budget") || desc.includes("budget");
-  });
-
-  // Fallback: if nothing matches the heuristic, show whatever the server returned
-  // so the blog page doesn't appear empty.
-  return filtered.length > 0 ? filtered : articles;
-}
 
 /** Infer scope from headline keywords (wireframe logic). */
 function categorizeArticle(article: NewsApiArticle): CategorizedArticle {
@@ -103,9 +90,7 @@ function mapArticleToPost(a: CategorizedArticle, index: number): BlogPost {
 }
 
 export default function Blog() {
-  const NEWS_API_BASE =
-    (import.meta.env.VITE_NEWS_API_URL as string | undefined) ||
-    (import.meta.env.DEV ? "/api/news" : "http://localhost:3001/api/news");
+  const newsEndpoint = getNewsApiUrl();
 
   const [posts, setPosts] = React.useState<BlogPost[]>([]);
   const [page, setPage] = React.useState(1);
@@ -116,84 +101,6 @@ export default function Blog() {
 
   const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
 
-  const SUBSCRIBE_API_URL = `${getBudgetApiBase()}/api/subscribe`;
-  const [subscriberName, setSubscriberName] = React.useState("");
-  const [subscriberEmail, setSubscriberEmail] = React.useState("");
-  const [subscribeSubmitting, setSubscribeSubmitting] = React.useState(false);
-  const [subscribeResultMessage, setSubscribeResultMessage] = React.useState<string | null>(null);
-  const [subscribeErrorMessage, setSubscribeErrorMessage] = React.useState<string | null>(null);
-
-  const validateSubscribe = () => {
-    const name = subscriberName.trim();
-    const email = subscriberEmail.trim().toLowerCase();
-    if (!name || name.length < 2) return "Please enter your name.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return "Please enter a valid email address.";
-    return null;
-  };
-
-  const onSubmitSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubscribeErrorMessage(null);
-    setSubscribeResultMessage(null);
-
-    const validationError = validateSubscribe();
-    if (validationError) {
-      setSubscribeErrorMessage(validationError);
-      return;
-    }
-
-    setSubscribeSubmitting(true);
-    try {
-      const res = await fetch(SUBSCRIBE_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: subscriberName, email: subscriberEmail }),
-      });
-
-      const raw = await res.text();
-      let data: {
-        ok?: boolean;
-        alreadySubscribed?: boolean;
-        message?: string;
-        error?: string;
-        detail?: string;
-      } = {};
-      try {
-        if (raw) data = JSON.parse(raw) as typeof data;
-      } catch {
-        /* non-JSON */
-      }
-
-      if (!res.ok) {
-        const parts = [
-          data.error,
-          import.meta.env.DEV && data.detail ? data.detail : null,
-          res.status === 404
-            ? "Subscription API not found. Run npm run dev:server or set VITE_API_URL to your API."
-            : null,
-        ].filter(Boolean);
-        setSubscribeErrorMessage(parts.length > 0 ? parts.join(" ") : "Subscription failed.");
-        return;
-      }
-
-      setSubscribeResultMessage(data.message ?? "Thank you for subscribing!");
-      if (!data.alreadySubscribed) {
-        setSubscriberName("");
-        setSubscriberEmail("");
-      }
-    } catch (err) {
-      console.error("[subscribe]", err);
-      setSubscribeErrorMessage(
-        import.meta.env.DEV
-          ? "Could not reach the API. Run the server in another terminal: npm run dev:server"
-          : "Network error. Please try again.",
-      );
-    } finally {
-      setSubscribeSubmitting(false);
-    }
-  };
-
   React.useEffect(() => {
     let cancelled = false;
 
@@ -201,13 +108,27 @@ export default function Blog() {
       setLoading(true);
       setError(null);
       try {
-        const url = new URL(NEWS_API_BASE, window.location.origin);
+        const url = newsEndpoint.startsWith("http")
+          ? new URL(newsEndpoint)
+          : new URL(newsEndpoint, window.location.origin);
         url.searchParams.set("page", String(page));
 
         const res = await fetch(url.toString());
-        if (!res.ok) throw new Error("Failed to fetch news");
+        let payload: unknown;
+        try {
+          payload = await res.json();
+        } catch {
+          throw new Error("Invalid response from news server.");
+        }
 
-        const payload: unknown = await res.json();
+        if (!res.ok) {
+          const msg =
+            payload && typeof payload === "object" && payload !== null && "error" in payload
+              ? String((payload as { error?: string }).error ?? "")
+              : "";
+          throw new Error(msg || "Failed to fetch news");
+        }
+
         let articles: NewsApiArticle[] = [];
         let total = 0;
 
@@ -223,19 +144,23 @@ export default function Blog() {
           total = typeof p.totalResults === "number" ? p.totalResults : articles.length;
         }
 
-        const filtered = filterBudgetArticles(articles);
-        const categorized = filtered.map(categorizeArticle);
+        const categorized = articles.map(categorizeArticle);
         const mapped = categorized.map(mapArticleToPost);
 
         if (!cancelled) {
           setPosts(mapped);
           setTotalResults(total);
         }
-      } catch {
+      } catch (e) {
         if (!cancelled) {
           setPosts([]);
           setTotalResults(0);
-          setError("Could not load articles. Is the news server running?");
+          const msg = e instanceof Error ? e.message : "Could not load articles.";
+          setError(
+            import.meta.env.DEV
+              ? `${msg} Run npm run dev:server or set VITE_API_URL.`
+              : msg,
+          );
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -246,7 +171,7 @@ export default function Blog() {
     return () => {
       cancelled = true;
     };
-  }, [NEWS_API_BASE, page]);
+  }, [newsEndpoint, page]);
 
   const goPrev = () => setPage((p) => Math.max(1, p - 1));
   const goNext = () => setPage((p) => Math.min(totalPages, p + 1));
@@ -417,97 +342,6 @@ export default function Blog() {
             )}
         </div>
       </div>
-
-      {/* Subscribe Section — matches Home (before footer in layout) */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border-2 p-8 md:p-12"
-            style={{ borderColor: "#e8eef5" }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
-                  Subscribe to get updates
-                </h2>
-                <p className="text-gray-600">
-                  Active citizens are keeping abreast of our work within civic-tech space; you should too!
-                </p>
-              </div>
-
-              <div>
-                <form className="space-y-4" onSubmit={onSubmitSubscribe}>
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    value={subscriberName}
-                    onChange={(e) => setSubscriberName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
-                    style={{
-                      borderColor: "#d1d5db",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#0B2545";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(11, 37, 69, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "#d1d5db";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                  <input
-                    type="email"
-                    placeholder="Your email address"
-                    value={subscriberEmail}
-                    onChange={(e) => setSubscriberEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
-                    style={{
-                      borderColor: "#d1d5db",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#0B2545";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(11, 37, 69, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "#d1d5db";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={subscribeSubmitting}
-                    className={cn(
-                      navButtonPrimary,
-                      "w-full",
-                      subscribeSubmitting ? "opacity-70 cursor-not-allowed" : "",
-                    )}
-                  >
-                    {subscribeSubmitting ? "Subscribing…" : "Subscribe"}
-                  </button>
-                  {subscribeResultMessage ? (
-                    <p className="text-sm font-semibold text-[#0B2545] mt-2">
-                      {subscribeResultMessage}
-                    </p>
-                  ) : null}
-                  {subscribeErrorMessage ? (
-                    <p className="text-sm font-semibold text-red-600 mt-2">
-                      {subscribeErrorMessage}
-                    </p>
-                  ) : null}
-                  <p className="text-xs text-gray-500 mt-3">
-                    Entering your name, email address and clicking &quot;Subscribe&quot; means you agree to receive
-                    updates about the work we do at CivicLens. The CivicLens will never spam you. Please,{" "}
-                    <a href="#" className="hover:underline" style={{ color: "#0B2545" }}>
-                      click here
-                    </a>{" "}
-                    to learn more about how we protect your privacy.
-                  </p>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

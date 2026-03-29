@@ -2,12 +2,7 @@ import { createBrowserRouter } from "react-router";
 import Layout from "./layout";
 import AboutUs from "./pages/About";
 import Blog from "./pages/Blog";
-import {
-  FederalBudget,
-  MunicipalBudgets,
-  ProvincialBudgets,
-  YearComparison,
-} from "./pages/budgetPlaceholders";
+import { YearComparison } from "./pages/budgetPlaceholders";
 import ContactUs from "./pages/Contact";
 import { Home } from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -19,9 +14,6 @@ export const router = createBrowserRouter([
     Component: Layout,
     children: [
       { index: true, Component: Home },
-      { path: "federal", Component: FederalBudget },
-      { path: "provincial", Component: ProvincialBudgets },
-      { path: "municipal", Component: MunicipalBudgets },
       { path: "comparison", Component: YearComparison },
       { path: "spendings", Component: Spendings },
       { path: "about-us", Component: AboutUs },

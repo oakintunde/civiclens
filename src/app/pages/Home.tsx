@@ -8,93 +8,14 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import * as React from "react";
 import { Link } from "react-router";
 import { cn } from "../components/ui/utils";
 import { federalBudget2025 } from "../data/budgetData";
-import { heroCtaPrimary, navButtonOnDarkOutline, navButtonPrimary } from "../lib/navButtonStyles";
-import { getBudgetApiBase } from "../lib/budgetApi";
+import { heroCtaPrimary, navButtonOnDarkOutline } from "../lib/navButtonStyles";
 
 export function Home() {
   const totalBudget = federalBudget2025.total;
   const formattedTotal = `$${(totalBudget / 1000000000).toFixed(1)}B`;
-
-  const SUBSCRIBE_API_URL = `${getBudgetApiBase()}/api/subscribe`;
-  const [subscriberName, setSubscriberName] = React.useState("");
-  const [subscriberEmail, setSubscriberEmail] = React.useState("");
-  const [submitting, setSubmitting] = React.useState(false);
-  const [resultMessage, setResultMessage] = React.useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-
-  const validate = () => {
-    const name = subscriberName.trim();
-    const email = subscriberEmail.trim().toLowerCase();
-    if (!name || name.length < 2) return "Please enter your name.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email address.";
-    return null;
-  };
-
-  const onSubmitSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-    setResultMessage(null);
-
-    const validationError = validate();
-    if (validationError) {
-      setErrorMessage(validationError);
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await fetch(SUBSCRIBE_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: subscriberName, email: subscriberEmail }),
-      });
-
-      const raw = await res.text();
-      let data: {
-        ok?: boolean;
-        alreadySubscribed?: boolean;
-        message?: string;
-        error?: string;
-        detail?: string;
-      } = {};
-      try {
-        if (raw) data = JSON.parse(raw) as typeof data;
-      } catch {
-        /* non-JSON (e.g. HTML 404 from host) */
-      }
-
-      if (!res.ok) {
-        const parts = [
-          data.error,
-          import.meta.env.DEV && data.detail ? data.detail : null,
-          res.status === 404
-            ? "Subscription API not found. Run npm run dev:server or set VITE_API_URL to your API."
-            : null,
-        ].filter(Boolean);
-        setErrorMessage(parts.length > 0 ? parts.join(" ") : "Subscription failed.");
-        return;
-      }
-
-      setResultMessage(data.message ?? "Thank you for subscribing!");
-      if (!data.alreadySubscribed) {
-        setSubscriberName("");
-        setSubscriberEmail("");
-      }
-    } catch (err) {
-      console.error("[subscribe]", err);
-      setErrorMessage(
-        import.meta.env.DEV
-          ? "Could not reach the API. Run the server in another terminal: npm run dev:server"
-          : "Network error. Please try again.",
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
     <div style={{ fontFamily: "Poppins, sans-serif" }}>
@@ -428,102 +349,6 @@ export function Home() {
               <p className="text-gray-600">
                 Compare budgets across regions and time periods to identify trends and priorities.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Subscribe Section */}
-      <section className="bg-gray-50 py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border-2 p-6 sm:p-8 md:p-12"
-            style={{ borderColor: "#e8eef5" }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
-              {/* Left Side - Text */}
-              <div>
-                <h2
-                  className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4"
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                >
-                  Subscribe to get updates
-                </h2>
-                <p className="text-gray-600">
-                  Active citizens are keeping abreast of our work within civic-tech space; you should too!
-                </p>
-              </div>
-
-              {/* Right Side - Form */}
-              <div>
-                <form className="space-y-4" onSubmit={onSubmitSubscribe}>
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    value={subscriberName}
-                    onChange={(e) => setSubscriberName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
-                    style={{
-                      borderColor: "#d1d5db",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#0B2545";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(11, 37, 69, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "#d1d5db";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                  <input
-                    type="email"
-                    placeholder="Your email address"
-                    value={subscriberEmail}
-                    onChange={(e) => setSubscriberEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 outline-none transition-all"
-                    style={{
-                      borderColor: "#d1d5db",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#0B2545";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(11, 37, 69, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "#d1d5db";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className={cn(
-                      navButtonPrimary,
-                      "w-full",
-                      submitting ? "opacity-70 cursor-not-allowed" : "",
-                    )}
-                  >
-                    {submitting ? "Subscribing…" : "Subscribe"}
-                  </button>
-                  {resultMessage ? (
-                    <p className="text-sm font-semibold text-[#0B2545] mt-2">
-                      {resultMessage}
-                    </p>
-                  ) : null}
-                  {errorMessage ? (
-                    <p className="text-sm font-semibold text-red-600 mt-2">
-                      {errorMessage}
-                    </p>
-                  ) : null}
-                  <p className="text-xs text-gray-500 mt-3">
-                    Entering your name, email address and clicking &quot;Subscribe&quot; means you agree to receive
-                    updates about the work we do at CivicLens. The CivicLens will never spam you. Please,{" "}
-                    <a href="#" className="hover:underline" style={{ color: "#0B2545" }}>
-                      click here
-                    </a>{" "}
-                    to learn more about how we protect your privacy.
-                  </p>
-                </form>
-              </div>
             </div>
           </div>
         </div>

@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { BudgetPieTooltip } from "./BudgetPieTooltip";
 import { PieActiveShape } from "./PieActiveShape";
-import { cn } from "../components/ui/utils";
+import { cn } from "./ui/utils";
 import {
   formatBillions,
   getFederalBudgetAllYearsSummary,
