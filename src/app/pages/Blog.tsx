@@ -104,8 +104,8 @@ function mapArticleToPost(a: CategorizedArticle, index: number): BlogPost {
 
 export default function Blog() {
   const NEWS_API_BASE =
-    (import.meta as { env: { VITE_NEWS_API_URL?: string } }).env
-      .VITE_NEWS_API_URL || "http://localhost:3001/api/news";
+    (import.meta.env.VITE_NEWS_API_URL as string | undefined) ||
+    (import.meta.env.DEV ? "/api/news" : "http://localhost:3001/api/news");
 
   const [posts, setPosts] = React.useState<BlogPost[]>([]);
   const [page, setPage] = React.useState(1);
@@ -168,8 +168,13 @@ export default function Blog() {
         setSubscriberName("");
         setSubscriberEmail("");
       }
-    } catch {
-      setSubscribeErrorMessage("Network error. Please try again.");
+    } catch (err) {
+      console.error("[subscribe]", err);
+      setSubscribeErrorMessage(
+        import.meta.env.DEV
+          ? "Could not reach the API. Run the server in another terminal: npm run dev:server"
+          : "Network error. Please try again.",
+      );
     } finally {
       setSubscribeSubmitting(false);
     }
@@ -182,7 +187,7 @@ export default function Blog() {
       setLoading(true);
       setError(null);
       try {
-        const url = new URL(NEWS_API_BASE);
+        const url = new URL(NEWS_API_BASE, window.location.origin);
         url.searchParams.set("page", String(page));
 
         const res = await fetch(url.toString());

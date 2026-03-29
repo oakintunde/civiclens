@@ -10,6 +10,15 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      // Same-origin /api in dev → Express on 3001 (subscribe, news, budgets).
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       // Alias @ to the src directory

@@ -70,8 +70,13 @@ export function Home() {
         setSubscriberName("");
         setSubscriberEmail("");
       }
-    } catch {
-      setErrorMessage("Network error. Please try again.");
+    } catch (err) {
+      console.error("[subscribe]", err);
+      setErrorMessage(
+        import.meta.env.DEV
+          ? "Could not reach the API. Run the server in another terminal: npm run dev:server"
+          : "Network error. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
