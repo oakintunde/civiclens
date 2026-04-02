@@ -96,15 +96,16 @@ export function HomeHeroStackedDonut() {
   }));
 
   return (
-    <div className="w-full h-full flex flex-col min-h-0">
+    <div className="w-full h-full flex flex-col min-h-0 flex-1">
       <p
-        className="shrink-0 text-base sm:text-lg font-semibold text-white/90 mb-2"
+        className="shrink-0 text-base sm:text-lg font-semibold text-white/90 mb-2 text-center lg:text-left"
         style={{ fontFamily: "Montserrat, sans-serif" }}
       >
         Interactive chart
       </p>
 
-      <div className="flex-1 min-h-0 w-full">
+      {/* Explicit min-height on small screens so Recharts measures a non-zero box (matches desktop hero treatment). */}
+      <div className="flex-1 min-h-[260px] sm:min-h-[300px] lg:min-h-0 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -114,8 +115,8 @@ export function HomeHeroStackedDonut() {
               cx="50%"
               cy="50%"
               // Scale the donut to better fill the hero's right column width/height.
-              innerRadius={Math.max(46, Math.min(74, donutData.length * 13))}
-              outerRadius={Math.max(98, Math.min(152, donutData.length * 30))}
+              innerRadius={Math.max(42, Math.min(74, donutData.length * 13))}
+              outerRadius={Math.max(88, Math.min(152, donutData.length * 30))}
               paddingAngle={1}
               isAnimationActive
               animationDuration={520}

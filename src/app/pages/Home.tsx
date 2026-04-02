@@ -26,7 +26,7 @@ export function Home() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-10 xl:gap-12 items-stretch">
+          <div className="grid grid-cols-1 gap-8 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-10 xl:gap-12 items-stretch">
             <div className="max-w-3xl min-w-0">
               <h1
                 className="text-[1.75rem] leading-tight sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
@@ -35,18 +35,19 @@ export function Home() {
                 Understanding Canada&apos;s Public Spending
               </h1>
               <p
-                className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-10 leading-relaxed"
+                className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 lg:mb-10 leading-relaxed"
                 style={{ color: "#c3d4e6" }}
               >
-                <span className="md:hidden">Explore transparent data on how your tax dollars are spent.</span>
-                <span className="hidden md:inline">
+                <span className="sm:hidden">Explore transparent data on how your tax dollars are spent.</span>
+                <span className="hidden sm:inline">
                   Explore transparent, accessible data on how your tax dollars are spent at federal,
                   provincial, and municipal levels.
                 </span>
               </p>
             </div>
 
-            <div className="w-full min-w-0 lg:justify-self-end flex h-full">
+            {/* Mobile: min-height so ResponsiveContainer gets a real height; lg+ matches desktop two-column stretch */}
+            <div className="w-full min-w-0 flex flex-col min-h-[min(52vh,380px)] max-w-[min(100%,28rem)] mx-auto lg:mx-0 lg:max-w-none lg:min-h-0 lg:h-full lg:flex-1 lg:justify-self-end">
               <HomeHeroStackedDonut />
             </div>
           </div>
