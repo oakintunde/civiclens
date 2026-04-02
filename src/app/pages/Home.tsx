@@ -27,7 +27,7 @@ export function Home() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl min-w-0">
             <h1
               className="text-[1.75rem] leading-tight sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
               style={{ fontFamily: "Montserrat, sans-serif" }}
