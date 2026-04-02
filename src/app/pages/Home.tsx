@@ -9,9 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link } from "react-router";
-import { cn } from "../components/ui/utils";
 import { federalBudget2025 } from "../data/budgetData";
-import { navButtonOnDarkOutline } from "../lib/navButtonStyles";
 import { HomeHeroStackedDonut } from "../components/HomeHeroStackedDonut";
 
 export function Home() {
@@ -46,14 +44,6 @@ export function Home() {
                   provincial, and municipal levels.
                 </span>
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-                <Link
-                  to="/spendings?level=province"
-                  className={cn(navButtonOnDarkOutline, "w-full justify-center sm:w-auto min-h-[44px]")}
-                >
-                  View Provincial Budgets
-                </Link>
-              </div>
             </div>
 
             <div className="w-full min-w-0 lg:justify-self-end flex h-full">
