@@ -1,6 +1,5 @@
-import type { PieSectorDataItem } from "recharts";
+import type { PieSectorDataItem, TooltipContentProps } from "recharts";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector, Tooltip } from "recharts";
-import type { TooltipContentProps } from "recharts";
 import { formatBillions } from "../data/budgetData";
 
 const TOOLTIP_COLOR = "rgb(11, 37, 69)";
@@ -98,7 +97,12 @@ export function HomeHeroStackedDonut() {
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">
-      <p className="shrink-0 text-sm font-semibold text-white/90 mb-2">Interactive chart</p>
+      <p
+        className="shrink-0 text-base sm:text-lg font-semibold text-white/90 mb-2"
+        style={{ fontFamily: "Montserrat, sans-serif" }}
+      >
+        Interactive chart
+      </p>
 
       <div className="flex-1 min-h-0 w-full">
         <ResponsiveContainer width="100%" height="100%">
@@ -110,8 +114,8 @@ export function HomeHeroStackedDonut() {
               cx="50%"
               cy="50%"
               // Scale the donut to better fill the hero's right column width/height.
-              innerRadius={Math.max(40, Math.min(66, donutData.length * 12))}
-              outerRadius={Math.max(86, Math.min(132, donutData.length * 26))}
+              innerRadius={Math.max(46, Math.min(74, donutData.length * 13))}
+              outerRadius={Math.max(98, Math.min(152, donutData.length * 30))}
               paddingAngle={1}
               isAnimationActive
               animationDuration={520}
