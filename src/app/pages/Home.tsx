@@ -28,7 +28,7 @@ export function Home() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:gap-10 xl:gap-12 items-stretch">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10 xl:gap-12 items-stretch">
             <div className="max-w-3xl min-w-0">
               <h1
                 className="text-[1.75rem] leading-tight sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"

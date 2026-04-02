@@ -109,8 +109,9 @@ export function HomeHeroStackedDonut() {
               nameKey="name"
               cx="50%"
               cy="50%"
-              innerRadius={Math.max(34, Math.min(60, donutData.length * 10))}
-              outerRadius={Math.max(70, Math.min(120, donutData.length * 22))}
+              // Scale the donut to better fill the hero's right column width/height.
+              innerRadius={Math.max(40, Math.min(66, donutData.length * 12))}
+              outerRadius={Math.max(86, Math.min(132, donutData.length * 26))}
               paddingAngle={1}
               isAnimationActive
               animationDuration={520}
