@@ -12,6 +12,7 @@ import { Link } from "react-router";
 import { cn } from "../components/ui/utils";
 import { federalBudget2025 } from "../data/budgetData";
 import { heroCtaPrimary, navButtonOnDarkOutline } from "../lib/navButtonStyles";
+import { HomeHeroStackedDonut } from "../components/HomeHeroStackedDonut";
 
 export function Home() {
   const totalBudget = federalBudget2025.total;
@@ -27,34 +28,43 @@ export function Home() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
-          <div className="max-w-3xl min-w-0">
-            <h1
-              className="text-[1.75rem] leading-tight sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              Understanding Canada&apos;s Public Spending
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-10 leading-relaxed" style={{ color: "#c3d4e6" }}>
-              <span className="md:hidden">Explore transparent data on how your tax dollars are spent.</span>
-              <span className="hidden md:inline">
-                Explore transparent, accessible data on how your tax dollars are spent at federal, provincial, and
-                municipal levels.
-              </span>
-            </p>
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 w-full sm:w-auto">
-              <Link
-                to="/spendings?level=federal"
-                className={cn(heroCtaPrimary, "gap-2 w-full justify-center sm:w-auto min-h-[44px]")}
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:gap-10 xl:gap-12 items-stretch">
+            <div className="max-w-3xl min-w-0">
+              <h1
+                className="text-[1.75rem] leading-tight sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
               >
-                Explore Federal Budget
-                <ArrowRight className="w-4 h-4 shrink-0" aria-hidden />
-              </Link>
-              <Link
-                to="/spendings?level=province"
-                className={cn(navButtonOnDarkOutline, "w-full justify-center sm:w-auto min-h-[44px]")}
+                Understanding Canada&apos;s Public Spending
+              </h1>
+              <p
+                className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-10 leading-relaxed"
+                style={{ color: "#c3d4e6" }}
               >
-                View Provincial Budgets
-              </Link>
+                <span className="md:hidden">Explore transparent data on how your tax dollars are spent.</span>
+                <span className="hidden md:inline">
+                  Explore transparent, accessible data on how your tax dollars are spent at federal,
+                  provincial, and municipal levels.
+                </span>
+              </p>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 w-full sm:w-auto">
+                <Link
+                  to="/spendings?level=federal"
+                  className={cn(heroCtaPrimary, "gap-2 w-full justify-center sm:w-auto min-h-[44px]")}
+                >
+                  Explore Federal Budget
+                  <ArrowRight className="w-4 h-4 shrink-0" aria-hidden />
+                </Link>
+                <Link
+                  to="/spendings?level=province"
+                  className={cn(navButtonOnDarkOutline, "w-full justify-center sm:w-auto min-h-[44px]")}
+                >
+                  View Provincial Budgets
+                </Link>
+              </div>
+            </div>
+
+            <div className="w-full min-w-0 lg:justify-self-end flex h-full">
+              <HomeHeroStackedDonut />
             </div>
           </div>
         </div>
