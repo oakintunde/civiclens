@@ -114,7 +114,9 @@ export function HomeHeroStackedDonut() {
       if (expanded) {
         return <ActiveSector {...props} popOutPx={10} />;
       }
-      const { isActive: _a, index: _i, ...rest } = props;
+      const { isActive, index, ...rest } = props;
+      void isActive;
+      void index;
       return (
         <Sector
           {...rest}
