@@ -11,7 +11,7 @@ import {
 import { Link } from "react-router";
 import { cn } from "../components/ui/utils";
 import { federalBudget2025 } from "../data/budgetData";
-import { heroCtaPrimary, navButtonOnDarkOutline } from "../lib/navButtonStyles";
+import { navButtonOnDarkOutline } from "../lib/navButtonStyles";
 import { HomeHeroStackedDonut } from "../components/HomeHeroStackedDonut";
 
 export function Home() {
@@ -46,14 +46,7 @@ export function Home() {
                   provincial, and municipal levels.
                 </span>
               </p>
-              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 w-full sm:w-auto">
-                <Link
-                  to="/spendings?level=federal"
-                  className={cn(heroCtaPrimary, "gap-2 w-full justify-center sm:w-auto min-h-[44px]")}
-                >
-                  Explore Federal Budget
-                  <ArrowRight className="w-4 h-4 shrink-0" aria-hidden />
-                </Link>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
                 <Link
                   to="/spendings?level=province"
                   className={cn(navButtonOnDarkOutline, "w-full justify-center sm:w-auto min-h-[44px]")}
