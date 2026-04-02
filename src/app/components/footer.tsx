@@ -89,7 +89,18 @@ export function Footer() {
             <div className="flex items-center gap-1">
               <span>Designed with</span>
               <Heart size={14} className="fill-red-500 text-red-500" />
-              <span>by Olamie for 2026 Final Project</span>
+              <span>
+                by{" "}
+                <a
+                  href="https://www.linkedin.com/in/usman-olaoluwa/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-white transition-colors"
+                >
+                  Olamie
+                </a>{" "}
+                for 2026 Final Project
+              </span>
             </div>
             <div>
               <span>This project is open source and all content are FREE!</span>
