@@ -136,7 +136,7 @@ export function MunicipalBudgetDashboard({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full min-w-0 max-w-full">
       {/* City detail */}
       {selectedRow ? (
         <>
@@ -156,7 +156,7 @@ export function MunicipalBudgetDashboard({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <div
-              className="bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
               style={{ borderColor: "#e8eef5" }}
             >
               <div
@@ -175,7 +175,7 @@ export function MunicipalBudgetDashboard({
             </div>
 
             <div
-              className="bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
               style={{ borderColor: "#e8eef5" }}
             >
               <div
@@ -193,7 +193,7 @@ export function MunicipalBudgetDashboard({
             </div>
 
             <div
-              className="bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
               style={{ borderColor: "#e8eef5" }}
             >
               <div
@@ -211,7 +211,7 @@ export function MunicipalBudgetDashboard({
             </div>
 
             <div
-              className="bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4 shadow-sm"
               style={{ borderColor: "#e8eef5" }}
             >
               <div
@@ -231,7 +231,7 @@ export function MunicipalBudgetDashboard({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div
-              className="bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
               style={{ borderColor: "#e8eef5" }}
             >
               <h3
@@ -293,7 +293,7 @@ export function MunicipalBudgetDashboard({
             </div>
 
             <div
-              className="bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
               style={{ borderColor: "#e8eef5" }}
             >
               <h3
@@ -307,8 +307,8 @@ export function MunicipalBudgetDashboard({
                   const selected = c.name === selectedSector;
                   return (
                     <li key={c.name}>
-                      <div className="flex justify-between gap-2 text-sm mb-1">
-                        <span className={cn("font-medium", selected ? "text-gray-900" : "text-gray-700")}>
+                      <div className="flex justify-between gap-2 text-sm mb-1 min-w-0">
+                        <span className={cn("font-medium min-w-0 break-words pr-2", selected ? "text-gray-900" : "text-gray-700")}>
                           {c.name}
                         </span>
                         <span
@@ -342,7 +342,7 @@ export function MunicipalBudgetDashboard({
       {/* Other sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div
-          className="bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
           style={{ borderColor: "#e8eef5" }}
         >
           <h3
@@ -385,7 +385,7 @@ export function MunicipalBudgetDashboard({
         </div>
 
         <div
-          className="bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6 shadow-sm"
           style={{ borderColor: "#e8eef5" }}
         >
           <h3

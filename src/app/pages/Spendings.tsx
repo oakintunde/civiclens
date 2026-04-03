@@ -1,6 +1,6 @@
 import * as React from "react";
-import { FederalBudgetDashboard } from "../components/FederalBudgetDashboard";
 import { BudgetFiltersCard } from "../components/BudgetFiltersCard";
+import { FederalBudgetDashboard } from "../components/FederalBudgetDashboard";
 import { MunicipalBudgetDashboard } from "../components/MunicipalBudgetDashboard";
 import { ProvincialBudgetDashboard } from "../components/ProvincialBudgetDashboard";
 import { SharePageSocialRow } from "../components/SharePageSocialRow";
@@ -43,7 +43,7 @@ export default function Spendings() {
   }, [level]);
 
   return (
-    <div style={{ fontFamily: "Poppins, sans-serif" }}>
+    <div className="w-full min-w-0 max-w-full" style={{ fontFamily: "Poppins, sans-serif" }}>
       <section
         style={{
           background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
@@ -53,7 +53,7 @@ export default function Spendings() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8">
             <div className="max-w-3xl min-w-0">
               <h1
-                className="text-[1.65rem] leading-tight sm:text-4xl md:text-5xl font-bold text-white mb-2"
+                className="text-[1.65rem] leading-tight sm:text-4xl md:text-5xl font-bold text-white mb-2 break-words"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
                 {title}
@@ -71,7 +71,7 @@ export default function Spendings() {
       <BudgetFiltersCard {...filters} />
 
       {level === "Federal" ? (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <section className="max-w-7xl mx-auto w-full min-w-0 px-4 sm:px-6 lg:px-8 pb-12">
           <FederalBudgetDashboard year={year} selectedSector={sector} />
         </section>
       ) : null}
@@ -83,7 +83,7 @@ export default function Spendings() {
       ) : null}
 
       {level === "Municipal" ? (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <section className="max-w-7xl mx-auto w-full min-w-0 px-4 sm:px-6 lg:px-8 pb-12">
           <MunicipalBudgetDashboard
             year={year}
             selectedSector={sector}

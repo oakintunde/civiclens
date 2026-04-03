@@ -133,7 +133,7 @@ export default function Contact() {
   };
 
   return (
-    <div style={{ fontFamily: "Poppins, sans-serif" }}>
+    <div className="w-full min-w-0 max-w-full" style={{ fontFamily: "Poppins, sans-serif" }}>
       {/* Hero */}
       <div
         style={{
@@ -142,12 +142,12 @@ export default function Contact() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <h1
-            className="text-[1.65rem] sm:text-4xl md:text-5xl font-bold text-white"
+            className="text-[1.65rem] sm:text-4xl md:text-5xl font-bold text-white break-words"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
             Contact
           </h1>
-          <p className="mt-3 text-base md:text-lg text-white/90 max-w-3xl">
+          <p className="mt-3 text-base md:text-lg text-white/90 max-w-3xl break-words">
             Have a question or suggestion? Reach out to CivicLens and help us improve access to clear, transparent public
             budget data for everyone.
           </p>

@@ -12,10 +12,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { BudgetPieTooltip } from "./BudgetPieTooltip";
-import { PieActiveShape } from "./PieActiveShape";
 import { formatBillions } from "../data/budgetData";
 import { computeYearComparison, type YearComparisonInput } from "../lib/yearComparison";
+import { BudgetPieTooltip } from "./BudgetPieTooltip";
+import { PieActiveShape } from "./PieActiveShape";
 
 type Props = YearComparisonInput;
 
@@ -34,7 +34,7 @@ export function YearComparisonDashboard({
   if (vm.error) {
     return (
       <div
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 rounded-xl border-2 py-3 text-sm text-amber-900"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 w-full min-w-0 rounded-xl border-2 py-3 text-sm text-amber-900 break-words"
         style={{ borderColor: "#fcd34d", backgroundColor: "#fffbeb" }}
         role="status"
       >
@@ -44,17 +44,19 @@ export function YearComparisonDashboard({
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
-      <p className="text-sm text-gray-600">
+    <div className="space-y-8 max-w-7xl mx-auto w-full min-w-0 px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+      <p className="text-xs sm:text-sm text-gray-600 break-words">
         <span className="font-semibold text-gray-800">{vm.scopeLabel}</span>
-        <span className="text-gray-400 mx-2">·</span>
-        Pie and bar charts use <strong>combined</strong> amounts ({vm.yearLabelA} + {vm.yearLabelB}) by sector. The
-        table lists each sector&apos;s total for each year separately.
+        <span className="text-gray-400 mx-2 hidden sm:inline">·</span>
+        <span className="block sm:inline sm:mt-0 mt-1">
+          Pie and bar charts use <strong>combined</strong> amounts ({vm.yearLabelA} + {vm.yearLabelB}) by sector. The
+          table lists each sector&apos;s total for each year separately.
+        </span>
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div
-          className="bg-white rounded-xl border-2 p-5 flex items-start gap-4 sm:col-span-1"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4 sm:col-span-1"
           style={{ borderColor: "#e8eef5" }}
         >
           <div
@@ -86,14 +88,14 @@ export function YearComparisonDashboard({
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border-2 p-5 flex items-start gap-4" style={{ borderColor: "#e8eef5" }}>
+        <div className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4" style={{ borderColor: "#e8eef5" }}>
           <div
             className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: "#e8eef5" }}
           >
             <DollarSign className="w-6 h-6" style={{ color: "#0B2545" }} />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm text-gray-600 mb-1">Total fiscal {vm.yearLabelB}</p>
             <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
               {formatBillions(vm.totalB)}
@@ -103,7 +105,7 @@ export function YearComparisonDashboard({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border-2 p-5 md:p-6" style={{ borderColor: "#e8eef5" }}>
+        <div className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6" style={{ borderColor: "#e8eef5" }}>
           <h3
             className="text-lg font-bold text-gray-900 mb-1"
             style={{ fontFamily: "Montserrat, sans-serif" }}
@@ -150,7 +152,7 @@ export function YearComparisonDashboard({
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border-2 p-5 md:p-6" style={{ borderColor: "#e8eef5" }}>
+        <div className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6" style={{ borderColor: "#e8eef5" }}>
           <h3
             className="text-lg font-bold text-gray-900 mb-1"
             style={{ fontFamily: "Montserrat, sans-serif" }}
@@ -160,7 +162,7 @@ export function YearComparisonDashboard({
           <p className="text-xs text-gray-500 mb-4">
             Billions — sum of both years per sector ({vm.yearLabelA} + {vm.yearLabelB}).
           </p>
-          <div className="h-[min(400px,70vh)] sm:h-[400px] w-full min-w-0">
+          <div className="h-[min(400px,70vh)] sm:h-[400px] w-full min-w-0 max-w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={vm.barData} layout="vertical" margin={{ left: 0, right: 8, top: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />

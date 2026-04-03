@@ -16,7 +16,7 @@ export function Home() {
   const formattedTotal = `$${(totalBudget / 1000000000).toFixed(1)}B`;
 
   return (
-    <div style={{ fontFamily: "Poppins, sans-serif" }}>
+    <div className="w-full min-w-0 max-w-full" style={{ fontFamily: "Poppins, sans-serif" }}>
       {/* Hero Section */}
       <section
         className="text-white"
@@ -285,7 +285,7 @@ export function Home() {
       <section className="bg-white border-y-2" style={{ borderColor: "#e8eef5" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h2
-            className="text-3xl font-bold text-gray-900 mb-8 text-center"
+            className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center px-2"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
             Why Civic Lens?

@@ -90,7 +90,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
   const detailPctSum = categoriesWithColors.reduce((s, c) => s + c.percentage, 0);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full min-w-0 max-w-full">
       {provinceSelection !== ALL_PROVINCES && !row ? (
         <div
           className="rounded-xl border-2 px-4 py-3 text-sm text-amber-900"
@@ -107,7 +107,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div
-              className="bg-white rounded-xl border-2 p-5 flex items-start gap-4"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4"
               style={{ borderColor: "#e8eef5" }}
             >
               <div
@@ -118,13 +118,13 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Province</p>
-                <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                <p className="text-2xl font-bold text-gray-900 break-words" style={{ fontFamily: "Montserrat, sans-serif" }}>
                   {scaledRow.province}
                 </p>
               </div>
             </div>
             <div
-              className="bg-white rounded-xl border-2 p-5 flex items-start gap-4"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4"
               style={{ borderColor: "#e8eef5" }}
             >
               <div
@@ -141,7 +141,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
               </div>
             </div>
             <div
-              className="bg-white rounded-xl border-2 p-5 flex items-start gap-4"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4"
               style={{ borderColor: "#e8eef5" }}
             >
               <div
@@ -161,7 +161,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div
-              className="bg-white rounded-xl border-2 p-5 md:p-6"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6"
               style={{ borderColor: "#e8eef5" }}
             >
               <h3
@@ -226,7 +226,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
             </div>
 
             <div
-              className="bg-white rounded-xl border-2 p-5 md:p-6"
+              className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6"
               style={{ borderColor: "#e8eef5" }}
             >
               <h3
@@ -240,8 +240,8 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
                   const selected = c.name === selectedSector;
                   return (
                     <li key={c.name}>
-                      <div className="flex justify-between items-baseline gap-2 mb-1">
-                        <span className={cn("font-medium text-gray-900", selected && "text-[#0B2545]")}>
+                      <div className="flex justify-between items-baseline gap-2 mb-1 min-w-0">
+                        <span className={cn("font-medium text-gray-900 min-w-0 break-words pr-2", selected && "text-[#0B2545]")}>
                           {c.name}
                         </span>
                         <span className="text-sm shrink-0 text-gray-800">
@@ -272,7 +272,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
       {/* Comparison charts — always for provincial view */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div
-          className="bg-white rounded-xl border-2 p-5 md:p-6"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6"
           style={{ borderColor: "#e8eef5" }}
         >
           <h3
@@ -281,7 +281,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
           >
             Total Budget Comparison
           </h3>
-          <div className="h-[320px] w-full">
+          <div className="h-[min(320px,70vh)] sm:h-[320px] w-full min-w-0 max-w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={comparisonRows} margin={{ top: 8, right: 8, left: 8, bottom: 48 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -311,7 +311,7 @@ export function ProvincialBudgetDashboard({ year, provinceSelection, selectedSec
         </div>
 
         <div
-          className="bg-white rounded-xl border-2 p-5 md:p-6"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6"
           style={{ borderColor: "#e8eef5" }}
         >
           <h3

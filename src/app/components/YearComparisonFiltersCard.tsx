@@ -28,7 +28,7 @@ export function YearComparisonFiltersCard({
       type="button"
       className={cn(
         navButtonBase,
-        "min-w-[160px] border-2 border-[#318cca] bg-[#318cca] text-white hover:bg-[#f48945] hover:border-[#f48945]",
+        "w-full sm:w-auto sm:min-w-[160px] justify-center border-2 border-[#318cca] bg-[#318cca] text-white hover:bg-[#f48945] hover:border-[#f48945]",
       )}
     >
       <BarChart3 className="w-4 h-4" />

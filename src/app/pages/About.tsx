@@ -13,7 +13,7 @@ import { navButtonPrimary } from "../lib/navButtonStyles";
 
 export default function About() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
       <div className="text-center mb-10 sm:mb-12">
         <h1
           className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4 px-2"
@@ -28,7 +28,7 @@ export default function About() {
       </div>
 
       <div
-        className="rounded-2xl p-8 md:p-12 mb-12 border-2"
+        className="rounded-2xl p-5 sm:p-8 md:p-12 mb-12 border-2"
         style={{
           background: "linear-gradient(to bottom right, #e8eef5, #c3d4e6)",
           borderColor: "#c3d4e6",
@@ -53,7 +53,7 @@ export default function About() {
 
       <div className="mb-12 space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-xl shadow-md p-8 border-2" style={{ borderColor: "#e8eef5" }}>
+          <div className="bg-white rounded-xl shadow-md p-5 sm:p-8 border-2" style={{ borderColor: "#e8eef5" }}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: "#e8eef5" }}>
               <Eye className="w-6 h-6" style={{ color: "#2563eb" }} />
             </div>
@@ -67,7 +67,7 @@ export default function About() {
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-8 border-2" style={{ borderColor: "#e8eef5" }}>
+          <div className="bg-white rounded-xl shadow-md p-5 sm:p-8 border-2" style={{ borderColor: "#e8eef5" }}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: "#dcfce7" }}>
               <Users className="w-6 h-6" style={{ color: "#16a34a" }} />
             </div>
@@ -95,8 +95,8 @@ export default function About() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-8 md:p-12 border-2" style={{ borderColor: "#e8eef5" }}>
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center" style={{ fontFamily: "Montserrat, sans-serif" }}>
+        <div className="bg-white rounded-xl shadow-md p-5 sm:p-8 md:p-12 border-2" style={{ borderColor: "#e8eef5" }}>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center px-2" style={{ fontFamily: "Montserrat, sans-serif" }}>
             What We Do
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -131,8 +131,8 @@ export default function About() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-8 md:p-12 border-2 mb-12" style={{ borderColor: "#e8eef5" }}>
-        <h2 className="text-3xl font-bold text-gray-900 mb-6" style={{ fontFamily: "Montserrat, sans-serif" }}>
+      <div className="bg-white rounded-xl shadow-md p-5 sm:p-8 md:p-12 border-2 mb-12" style={{ borderColor: "#e8eef5" }}>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 break-words" style={{ fontFamily: "Montserrat, sans-serif" }}>
           Why Budget Transparency Matters
         </h2>
         <div className="space-y-6 text-gray-700">
@@ -169,7 +169,7 @@ export default function About() {
       </div>
 
       <div
-        className="rounded-xl p-8 mb-12 border-2"
+        className="rounded-xl p-5 sm:p-8 mb-12 border-2"
         style={{
           background: "linear-gradient(to right, #e8eef5, #c3d4e6)",
           borderColor: "#c3d4e6",
@@ -210,7 +210,7 @@ export default function About() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-8 border-2" style={{ borderColor: "#e8eef5" }}>
+      <div className="bg-white rounded-xl shadow-md p-5 sm:p-8 border-2" style={{ borderColor: "#e8eef5" }}>
         <div className="text-center max-w-2xl mx-auto">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: "#e8eef5" }}>
             <Mail className="w-8 h-8" style={{ color: "#0B2545" }} />

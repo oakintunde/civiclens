@@ -177,7 +177,7 @@ export default function Blog() {
   const goNext = () => setPage((p) => Math.min(totalPages, p + 1));
 
   return (
-    <div style={{ fontFamily: "Poppins, sans-serif" }}>
+    <div className="w-full min-w-0 max-w-full" style={{ fontFamily: "Poppins, sans-serif" }}>
       <div
         style={{
           background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
@@ -205,14 +205,14 @@ export default function Blog() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="w-full">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
               <h2
-                className="text-2xl font-bold text-gray-900"
+                className="text-xl sm:text-2xl font-bold text-gray-900 min-w-0"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
                 Latest posts
               </h2>
-              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 sm:shrink-0">
                 <BookOpen className="w-4 h-4" />
                 <span>Page {page}</span>
               </div>
@@ -225,7 +225,7 @@ export default function Blog() {
             )}
 
             {loading ? (
-              <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-3">
+              <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: pageSize }, (_, i) => i).map((i) => (
                   <div
                     key={i}
@@ -241,7 +241,7 @@ export default function Blog() {
               <p className="text-gray-600">No articles found for this page.</p>
             ) : (
               <>
-                <ul className="grid w-full list-none grid-cols-1 gap-5 p-0 m-0 md:grid-cols-3">
+                <ul className="grid w-full list-none grid-cols-1 gap-5 p-0 m-0 sm:grid-cols-2 lg:grid-cols-3">
                   {posts.map((post) => {
                     return (
                       <li key={post.id} className="min-h-0 h-full min-w-0">

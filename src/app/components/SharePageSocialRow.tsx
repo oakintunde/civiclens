@@ -31,8 +31,10 @@ export function SharePageSocialRow({ pageUrl, shareTitle }: SharePageSocialRowPr
 
   return (
     <div className="self-start lg:self-auto w-full lg:w-auto min-w-0">
-      <p className="text-white font-semibold mb-2 sm:mb-3 text-sm sm:text-base lg:text-right">Share this page</p>
-      <div className="flex flex-wrap items-center gap-2 lg:justify-end max-w-full">
+      <p className="text-white font-semibold mb-2 sm:mb-3 text-sm sm:text-base text-center lg:text-right">
+        Share this page
+      </p>
+      <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2 max-w-full">
         <button
           type="button"
           onClick={copyLink}

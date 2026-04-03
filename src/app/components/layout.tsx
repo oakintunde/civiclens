@@ -181,7 +181,7 @@ export function Layout() {
         ) : null}
       </header>
 
-      <main className="min-w-0">
+      <main className="min-w-0 w-full max-w-full">
         <Outlet />
       </main>
 

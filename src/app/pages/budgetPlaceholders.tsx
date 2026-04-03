@@ -8,7 +8,7 @@ export function YearComparison() {
   const filters = useYearComparisonFiltersState();
 
   return (
-    <div style={{ fontFamily: "Poppins, sans-serif" }}>
+    <div className="w-full min-w-0 max-w-full" style={{ fontFamily: "Poppins, sans-serif" }}>
       <div
         style={{
           background: "linear-gradient(to bottom right, #0B2545, #193865, #234b7f)",
@@ -21,16 +21,16 @@ export function YearComparison() {
                 <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
               </div>
               <h1
-                className="text-[1.65rem] sm:text-4xl md:text-5xl font-bold text-white min-w-0"
+                className="text-[1.65rem] sm:text-4xl md:text-5xl font-bold text-white min-w-0 break-words"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
                 Year-over-Year Trends
               </h1>
             </div>
-            <p className="mt-1 text-base md:text-lg text-white/90 max-w-3xl">
+            <p className="mt-1 text-base md:text-lg text-white/90 max-w-3xl break-words">
               Track budget changes over time and understand spending trends from 2020 to 2025.
             </p>
-            <p className="mt-4 text-sm sm:text-base text-white/85 max-w-3xl leading-relaxed">
+            <p className="mt-4 text-sm sm:text-base text-white/85 max-w-3xl leading-relaxed break-words">
               Choose a government level and two fiscal years to compare (for example, 2025 vs 2024).
             </p>
           </div>

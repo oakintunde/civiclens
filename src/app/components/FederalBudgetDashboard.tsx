@@ -59,11 +59,11 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
   const totalPercentage = snap.categories.reduce((sum, c) => sum + c.percentage, 0);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full min-w-0 max-w-full">
       {/* Summary metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div
-          className="bg-white rounded-xl border-2 p-5 flex items-start gap-4"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4"
           style={{ borderColor: "#e8eef5" }}
         >
           <div
@@ -81,7 +81,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
         </div>
 
         <div
-          className="bg-white rounded-xl border-2 p-5 flex items-start gap-4"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4"
           style={{ borderColor: "#e8eef5" }}
         >
           <div
@@ -99,7 +99,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
         </div>
 
         <div
-          className="bg-white rounded-xl border-2 p-5 flex items-start gap-4"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4"
           style={{ borderColor: "#e8eef5" }}
         >
           <div
@@ -118,7 +118,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
         </div>
 
         <div
-          className="bg-white rounded-xl border-2 p-5 flex items-start gap-4"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 flex items-start gap-4"
           style={{ borderColor: "#e8eef5" }}
         >
           <div
@@ -205,7 +205,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
         </div>
 
         <div
-          className="bg-white rounded-xl border-2 p-5 md:p-6"
+          className="min-w-0 bg-white rounded-xl border-2 p-5 md:p-6"
           style={{ borderColor: "#e8eef5" }}
         >
           <h3
@@ -214,7 +214,7 @@ export function FederalBudgetDashboard({ year, selectedSector }: Props) {
           >
             Spending by Category (Billions)
           </h3>
-          <div className="h-[min(400px,70vh)] sm:h-[400px] w-full min-w-0">
+          <div className="h-[min(400px,70vh)] sm:h-[400px] w-full min-w-0 max-w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData} layout="vertical" margin={{ left: 0, right: 8, top: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
