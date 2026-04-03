@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, Newspaper } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Newspaper } from "lucide-react";
 import * as React from "react";
 import { cn } from "../components/ui/utils";
 import { LOCAL_BLOG_POSTS } from "../data/localBlogPosts";
@@ -215,20 +215,16 @@ export default function Blog() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="w-full">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="flex flex-wrap items-center gap-3 mb-6">
             <h2
               className="text-xl sm:text-2xl font-bold text-gray-900 min-w-0"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               Latest posts
             </h2>
-            <div className="flex items-center gap-2 text-sm text-gray-600 sm:shrink-0">
-              <BookOpen className="w-4 h-4" />
-              <span>Page {page}</span>
-              {feedMode === "local" ? (
-                <span className="text-amber-800 font-medium">· Saved links</span>
-              ) : null}
-            </div>
+            {feedMode === "local" ? (
+              <span className="text-sm text-amber-800 font-medium">Saved links</span>
+            ) : null}
           </div>
 
           {feedMode === "local" && !loading ? (
