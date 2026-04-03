@@ -1,17 +1,8 @@
-import * as React from "react";
 import { BudgetFiltersCard } from "../components/BudgetFiltersCard";
 import { FederalBudgetDashboard } from "../components/FederalBudgetDashboard";
 import { MunicipalBudgetDashboard } from "../components/MunicipalBudgetDashboard";
 import { ProvincialBudgetDashboard } from "../components/ProvincialBudgetDashboard";
-import { SharePageSocialRow } from "../components/SharePageSocialRow";
 import { useBudgetFiltersState } from "../hooks/useBudgetFiltersState";
-import type { BudgetLevel } from "../lib/budgetApi";
-
-function spendingsLevelQuery(level: BudgetLevel): "federal" | "province" | "municipal" {
-  if (level === "Federal") return "federal";
-  if (level === "Province") return "province";
-  return "municipal";
-}
 
 export default function Spendings() {
   const filters = useBudgetFiltersState({ syncUrlLevel: true });
@@ -36,12 +27,6 @@ export default function Spendings() {
         ? "Compare provincial government spending across Canada's provinces and territories"
         : "Explore how major Canadian cities allocate budgets for local services and infrastructure.";
 
-  const sharePageUrl = React.useMemo(() => {
-    const base =
-      typeof window !== "undefined" ? window.location.origin : "https://civiclens.ca";
-    return `${base}/spendings?level=${spendingsLevelQuery(level)}`;
-  }, [level]);
-
   return (
     <div className="w-full min-w-0 max-w-full" style={{ fontFamily: "Poppins, sans-serif" }}>
       <section
@@ -50,20 +35,14 @@ export default function Spendings() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8">
-            <div className="max-w-3xl min-w-0">
-              <h1
-                className="text-[1.65rem] leading-tight sm:text-4xl md:text-5xl font-bold text-white mb-2 break-words"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                {title}
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg text-white/90">{subtitle}</p>
-            </div>
-            <SharePageSocialRow
-              pageUrl={sharePageUrl}
-              shareTitle={`CivicLens — ${title}`}
-            />
+          <div className="max-w-3xl min-w-0">
+            <h1
+              className="text-[1.65rem] leading-tight sm:text-4xl md:text-5xl font-bold text-white mb-2 break-words"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+            >
+              {title}
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-white/90">{subtitle}</p>
           </div>
         </div>
       </section>
